@@ -2,10 +2,6 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
 from faker import Faker
-
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Modelos.modelos import RegistroFacturacionSchema, db, RegistroFacturacion
 
 IdentificadorMC = 1

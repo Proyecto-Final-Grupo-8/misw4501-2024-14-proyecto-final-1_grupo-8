@@ -1,0 +1,19 @@
+version: "3.9"
+
+
+services:
+  apigateway:
+    build:
+      context: ./GestorFacturacion
+    ports:
+      - "5000:5000"
+    networks:
+      - backend
+
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
