@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
-from tasks import solicitudFactura as solicitudFacturaTask, estadoMicroservicio as estadoMicroservicioTask
+from Experimento_Voting.ColaSolicitudes.Celery.tasks import solicitudFactura as solicitudFacturaTask, estadoMicroservicio as estadoMicroservicioTask
 
 app = Flask(__name__)
 api = Api(app)

@@ -2,7 +2,7 @@ from datetime import datetime
 from celery import Celery
 import requests
 
-app = Celery('cola_solicitudes', broker='redis://localhost:6379/0')
+app = Celery('cola_solicitudes', broker='redis://redis:6379/0')
 
 @app.task
 def solicitudFactura(id_factura):

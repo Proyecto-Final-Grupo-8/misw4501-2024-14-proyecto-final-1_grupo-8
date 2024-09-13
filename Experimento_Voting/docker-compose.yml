@@ -1,19 +1,53 @@
 version: "3.9"
 
-
 services:
   apigateway:
     build:
-      context: ./GestorFacturacion
+      context: ./APIGateway
     ports:
       - "5000:5000"
     networks:
       - backend
 
+  gestorfacturacion:
+    build:
+      context: ./GestorFacturacion
+    ports:
+      - "5001:5000"
+    networks:
+      - backend
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  celery-worker:
+    build: ./ColaSolicitudes/Celery
+    command: >
+      "celery -A tasks worker --loglevel=info"
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  colasolicitudes:
+    build:
+      context: ./ColaSolicitudes
+    ports:
+      - "5004:5000"
+    networks:
+      - backend
 
 networks:
   backend:
     driver: bridge
+
+
+
+
 
 volumes:
   postgres_data:
