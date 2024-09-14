@@ -5,6 +5,7 @@ from celery import Celery
 from dotenv import load_dotenv
 from modelos import db, RegistroFacturacion
 from faker import Faker
+from celery.result import AsyncResult
 
 fake = Faker()
 
@@ -24,7 +25,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-Celery_app = Celery('cola_solicitudes', broker=f'redis://{redis_host}:6379/0')
+Celery_app = Celery('cola_solicitudes', broker=f'redis://{redis_host}:6379/0', backend=f'redis://{redis_host}:6379/0')
 
 def crear_registros_aleatorios(cantidad=100):
     registros = []
@@ -66,10 +67,40 @@ class SolicitudFactura(Resource):
 class EstadoMicroservicio(Resource):
     def get(self):
         return jsonify({"message": "API Funcionando"})
+    
+
+class ConsultaTarea(Resource):
+    def get(self, task_id):
+        task = Celery_app.AsyncResult(task_id)
+        
+        if task.state == 'PENDING':
+            response = {
+                'state': task.state,
+                'status': 'Pendiente...'
+            }
+        elif task.state == 'SUCCESS':
+            response = {
+                'state': task.state,
+                'result': task.result  # El resultado de la tarea cuando se completa
+            }
+        elif task.state == 'FAILURE':
+            response = {
+                'state': task.state,
+                'status': str(task.info)  # Error si la tarea falló
+            }
+        else:
+            response = {
+                'state': task.state,
+                'status': task.info if task.info else 'Sin información disponible'  # Para otros estados como PROGRESS
+            }
+        
+        return jsonify(response)
+
 
 # Agregar recursos al API
 api.add_resource(EstadoMicroservicio, '/')
 api.add_resource(SolicitudFactura, '/SolicitudFactura/<string:id_factura>')
+api.add_resource(ConsultaTarea, '/ConsultaTarea/<string:task_id>')
 
 if __name__ == '__main__':
     with app.app_context():
