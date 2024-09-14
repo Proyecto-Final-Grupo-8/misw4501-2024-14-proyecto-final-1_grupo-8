@@ -1,27 +1,40 @@
+import os
+from dotenv import load_dotenv
 from datetime import datetime
 from celery import Celery
 import requests
 
-app = Celery('cola_solicitudes', broker='redis://redis:6379/0')
+load_dotenv()
+redis_host = os.getenv('Redis_HOST')
+MC1_host = os.getenv('MC1_HOST')
+MC2_host = os.getenv('MC2_HOST')
+MC3_host = os.getenv('MC3_HOST')
 
-@app.task
-def solicitudFactura(id_factura):
+MC1_port = os.getenv('MC1_PORT')
+MC2_port = os.getenv('MC2_PORT')
+MC3_port = os.getenv('MC3_PORT')
+
+
+app = Celery('cola_solicitudes', broker=f'redis://{redis_host}:6379/0')
+
+@app.task(name='cola_solicitudes.solicitudFactura')
+def solicitudFactura(id_factura, body_data):
     try:
-        Response_GF1 = requests.get(f'http://localhost:5001/{id_factura}')
+        Response_GF1 = requests.post(f'http://{MC1_host}:{MC1_port}/{id_factura}', json=body_data)
         Response_GF1.raise_for_status()
         Response_GF1 = Response_GF1.json()
     except requests.exceptions.RequestException as e:
         return {"error": f"Error en el microservicio 1: {str(e)}"}
 
     try:
-        Response_GF2 = requests.get(f'http://localhost:5002/{id_factura}')
+        Response_GF2 = requests.post(f'http://{MC2_host}:{MC2_port}/{id_factura}', json=body_data)
         Response_GF2.raise_for_status()
         Response_GF2 = Response_GF2.json()
     except requests.exceptions.RequestException as e:
         return {"error": f"Error en el microservicio 2: {str(e)}"}
 
     try:
-        Response_GF3 = requests.get(f'http://localhost:5003/{id_factura}')
+        Response_GF3 = requests.post(f'http://{MC3_host}:{MC3_port}/{id_factura}', json=body_data)
         Response_GF3.raise_for_status()
         Response_GF3 = Response_GF3.json()
     except requests.exceptions.RequestException as e:
@@ -39,6 +52,6 @@ def solicitudFactura(id_factura):
         return {"message": "Inconsistencia entre microservicios", "statuses": statuses}
 
 
-@app.task
+@app.task(name='cola_solicitudes.estadoMicroservicio')
 def estadoMicroservicio():
     return f'ColaSolicitudes Funcionando - {datetime.now()}'
