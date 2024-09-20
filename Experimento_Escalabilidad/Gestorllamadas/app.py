@@ -67,7 +67,7 @@ class Estado(Resource):
 
 
 
-api.add_resource(CrearIncidente, '/crear-incidente')
+api.add_resource(CrearIncidente, '/crear-llamada')
 api.add_resource(Estado, '/estado')
 
 
