@@ -5,14 +5,7 @@ services:
     build:
       context: ./GestorIncidentes
     ports:
-      - "5001:5000"
-    environment:
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_HOST=database-1.cnyu44uss058.us-east-1.rds.amazonaws.com
-      - DB_PORT=5432
-      - DB_NAME=postgres
-
+      - "5000:5000"
     networks:
       - backend
 

@@ -1,13 +1,11 @@
-FROM alpine:3.14   
-
-RUN apk add py3-pip\
-    && pip install --upgrade pip
+FROM python:3.10-slim
 
 WORKDIR /app
-COPY . /app/
+COPY ../requirements.txt .
 
-RUN pip install install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 5000 
+COPY . .
 
-CMD ["python3", "app.py"]
+EXPOSE 5000
+CMD ["python", "app.py"]

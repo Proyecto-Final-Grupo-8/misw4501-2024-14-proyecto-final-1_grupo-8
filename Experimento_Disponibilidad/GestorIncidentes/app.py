@@ -65,15 +65,11 @@ class Estado(Resource):
     def get(self):
         return {"status": "OK"}, 200
 
-
-
 api.add_resource(CrearIncidente, '/crear-incidente')
-api.add_resource(Estado, '/estado')
+api.add_resource(Estado, '/')
 
 
 if __name__ == '__main__':
     with app.app_context():
-        print(db.engine)
-        db.create_all() 
-        app.run(debug=True)
+        app.run(host='0.0.0.0', port=5000)
 
