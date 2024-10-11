@@ -2,8 +2,8 @@ name: Deploy to Cloud Run
 
 env:
   SERVICE_NAME: custom-fastapi-service
-  PROJECT_ID: h-t-d-a-f-a-t-g-c-r
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/h-t-d-a-f-a-t-g-c-r/custom-fastapi/custom-fastapi
+  PROJECT_ID: proyecto-final-438201
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/custom-fastapi/custom-fastapi
 
 on:
   push:
