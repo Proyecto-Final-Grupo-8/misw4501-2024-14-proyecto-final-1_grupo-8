@@ -29,21 +29,25 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: ${{ env.PROJECT_ID }}
 
-      - name: Configure Docker
+      - name: Configure Docker for GCP
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
 
-      - name: Build and Push Docker Image
+      - name: Build Docker image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f Dockerfile.prod .
-          docker push ${{ env.DOCKER_IMAGE_URL }}:latest
+          docker build -t ${{ env.DOCKER_IMAGE_URL }} ./Backend
+
+      - name: Push Docker image to Google Container Registry
+        run: |
+          docker push ${{ env.DOCKER_IMAGE_URL }}
 
       - name: Deploy to Cloud Run
         run: |
-          echo SERVICE_NAME $SERVICE_NAME
-          gcloud run deploy $SERVICE_NAME \
-            --image ${{ env.DOCKER_IMAGE_URL }}:latest \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.DOCKER_IMAGE_URL }} \
+            --region us-central1 \
             --platform managed \
-            --region us-east1 \
             --allow-unauthenticated
