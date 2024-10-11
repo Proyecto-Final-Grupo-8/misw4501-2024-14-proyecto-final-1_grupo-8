@@ -8,8 +8,8 @@ class RegistroLlamadas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.String(100), nullable=False)
-    fecha_apertura = db.Column(db.DateTime, nullable=False)  # Cambié a fecha_apertura
-    fecha_cierre = db.Column(db.DateTime, nullable=True)    # Cambié a fecha_cierre
+    fecha_apertura = db.Column(db.DateTime, nullable=False)  
+    fecha_cierre = db.Column(db.DateTime, nullable=True)   
     estado = db.Column(db.String(100), nullable=False)
     
     def __str__(self) -> str:

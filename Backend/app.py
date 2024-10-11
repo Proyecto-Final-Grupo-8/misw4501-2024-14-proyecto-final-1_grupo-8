@@ -1,8 +1,6 @@
-
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
-from faker import Faker
 from Modelos.modelo import RegistroIncidentesSchema, db, RegistroLlamadas
 from datetime import datetime
 from dotenv import load_dotenv
@@ -25,7 +23,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 api = Api(app)
-fake = Faker()
 
 class Estado(Resource):
     def get(self):
@@ -36,5 +33,6 @@ api.add_resource(Estado, '/')
 
 if __name__ == '__main__':
     with app.app_context():
+        db.create_all()
         app.run(host='0.0.0.0', port=5000)
 
