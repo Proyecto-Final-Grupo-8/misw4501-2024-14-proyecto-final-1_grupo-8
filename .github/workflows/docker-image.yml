@@ -1,7 +1,7 @@
 name: Deploy to Cloud Run
 
 env:
-  SERVICE_NAME: custom-fastapi-service
+  SERVICE_NAME: backend
   PROJECT_ID: proyecto-final-438201
   DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/backend/backend
 
