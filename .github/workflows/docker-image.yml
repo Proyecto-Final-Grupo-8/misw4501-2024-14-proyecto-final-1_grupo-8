@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 env:
   SERVICE_NAME: custom-fastapi-service
   PROJECT_ID: proyecto-final-438201
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/backend
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/backend/backend
 
 on:
   push:
@@ -32,22 +32,22 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Configure Docker for GCP
+      - name: Configure Docker for GCP (Artifact Registry)
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }} ./Backend
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./Backend
 
-      - name: Push Docker image to Google Container Registry
+      - name: Push Docker image to Artifact Registry
         run: |
-          docker push ${{ env.DOCKER_IMAGE_URL }}
+          docker push ${{ env.DOCKER_IMAGE_URL }}:latest
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.DOCKER_IMAGE_URL }} \
+            --image ${{ env.DOCKER_IMAGE_URL }}:latest \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated
