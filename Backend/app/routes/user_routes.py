@@ -24,3 +24,9 @@ def login():
 def user_info():
     current_user_id = get_jwt_identity()
     return get_user_info(current_user_id)
+
+
+@user_bp.route('/ping', methods=['GET'])
+@jwt_required()
+def user_ping():
+    return {"message": "health"}
