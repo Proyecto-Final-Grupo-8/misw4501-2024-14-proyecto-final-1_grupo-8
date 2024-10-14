@@ -27,6 +27,5 @@ def user_info():
 
 
 @user_bp.route('/ping', methods=['GET'])
-@jwt_required()
 def user_ping():
     return {"message": "health"}
