@@ -21,4 +21,7 @@ def create_app():
     app.register_blueprint(empresa_bp, url_prefix='/api')
     # app.register_blueprint(incidence_bp, url_prefix='/api')
 
+    from app.errors import register_error_handlers
+    register_error_handlers(app)
+    
     return app

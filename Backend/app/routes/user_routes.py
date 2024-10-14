@@ -1,7 +1,11 @@
 # app/routes/user_routes.py
 
 from flask import Blueprint, jsonify, request
-from app.services.user_service import create_user, authenticate_user, get_user_info
+from app.services.user_service import (
+    create_user, 
+    authenticate_user, 
+    get_user_info,
+    test_connection_db)
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 user_bp = Blueprint('user_bp', __name__)
@@ -24,3 +28,12 @@ def login():
 def user_info():
     current_user_id = get_jwt_identity()
     return get_user_info(current_user_id)
+
+@user_bp.route('/ping', methods=['GET'])
+def test_connection():
+    try:
+        result = test_connection_db()
+        return jsonify({"status": "success", "result": result})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+

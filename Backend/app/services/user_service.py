@@ -1,10 +1,14 @@
 # app/services/user_service.py
 
 from app.models.user import User
-from app.models.empresas import Empresa, Contrato
+from app.models.empresas import Empresa
+from app.models.contrato import Contrato
 from app import db
 from flask_jwt_extended import create_access_token
 import datetime
+
+def test_connection_db():
+    return db.engine.execute("SELECT 1").fetchall()
 
 def create_user(data):
     username = data.get('username')
