@@ -10,7 +10,7 @@ def create_app():
 
     # Aquí inicializa Flask-Migrate
     migrate.init_app(app, db)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     with app.app_context():
         db.create_all()
