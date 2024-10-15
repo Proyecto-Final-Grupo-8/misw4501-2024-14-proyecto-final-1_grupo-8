@@ -1,5 +1,6 @@
 from flask import Flask
 from app.extensions import db, migrate, init_extensions
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
@@ -9,6 +10,7 @@ def create_app():
 
     # Aquí inicializa Flask-Migrate
     migrate.init_app(app, db)
+    CORS(app)
 
     with app.app_context():
         db.create_all()
