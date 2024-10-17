@@ -57,5 +57,7 @@ jobs:
             --allow-unauthenticated
         continue-on-error: false
 
-
+      - name: Deployment failed
+        if: failure()
+        run: echo "Deployment to Cloud Run failed. Please check the logs and try again."
             
