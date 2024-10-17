@@ -1,5 +1,0 @@
-API solicitudes: Puerto 5000
-Cola solicitudes: Puerto 5004
-Gestor Facturacion 1: Puerto 5001
-Gestor Facturacion 2: Puerto 5002
-Gestor Facturacion 3: Puerto 5003
