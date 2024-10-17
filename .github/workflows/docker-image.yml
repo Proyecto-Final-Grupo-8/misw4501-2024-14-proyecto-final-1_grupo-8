@@ -24,24 +24,29 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ env.PROJECT_ID }}'
+        continue-on-error: false
 
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ env.PROJECT_ID123 }}'
+        continue-on-error: false
 
       - name: Configure Docker for GCP (Artifact Registry)
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
+        continue-on-error: false
 
       - name: Build Docker image
         run: |
           docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./Backend
+        continue-on-error: false
 
       - name: Push Docker image to Artifact Registry
         run: |
           docker push ${{ env.DOCKER_IMAGE_URL }}:latest
+        continue-on-error: false
 
       - name: Deploy to Cloud Run
         run: |
@@ -50,6 +55,9 @@ jobs:
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated
+        continue-on-error: false
 
-
-            
+      # Step to notify in case of failure
+      - name: Deployment failed
+        if: failure()
+        run: echo "Deployment to Cloud Run failed. Please check the logs and try again."
