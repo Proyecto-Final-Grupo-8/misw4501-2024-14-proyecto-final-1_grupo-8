@@ -12,12 +12,18 @@ on:
 
 jobs:
   dockerize-and-deploy:
-    if: contains(github.event.head_commit.message.lowercase , 'despliegue') || contains(github.event.head_commit.message.lowercase, 'deploy') || contains(github.event.head_commit.message.lowercase, 'release')
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Extract commit message
+        id: extract_message
+        run: echo "COMMIT_MSG=$(echo '${{ github.event.head_commit.message }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Check if commit message contains deploy-related keywords
+        if: contains(steps.extract_message.outputs.COMMIT_MSG, 'despliegue') || contains(steps.extract_message.outputs.COMMIT_MSG, 'deploy') || contains(steps.extract_message.outputs.COMMIT_MSG, 'release')
+        run: echo "Deploy-related commit message detected"
 
       - name: Google Cloud Auth
         uses: 'google-github-actions/auth@v2'
