@@ -12,8 +12,8 @@ def create_app():
     migrate.init_app(app, db)
     CORS(app, resources={r"/*": {"origins": "*"}})
 
-    with app.app_context():
-        db.create_all()
+    #with app.app_context():
+        #db.create_all()
 
     # Registrar el blueprint de usuario
     from app.routes.user_routes import user_bp
