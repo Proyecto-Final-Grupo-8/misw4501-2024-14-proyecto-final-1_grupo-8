@@ -1,8 +1,8 @@
 """Test nueva estructura
 
-Revision ID: 97df5a9ef0bf
+Revision ID: cc31146d086c
 Revises: 
-Create Date: 2024-10-18 22:10:24.454976
+Create Date: 2024-10-18 23:32:27.327095
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '97df5a9ef0bf'
+revision = 'cc31146d086c'
 down_revision = None
 branch_labels = None
 depends_on = None
