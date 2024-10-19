@@ -18,9 +18,9 @@ def create_app():
     # Registrar el blueprint de usuario
     from app.routes.user_routes import user_bp
     from app.routes.empresa_routes import empresa_bp
-    # from app.routes.incidence_routes import incidence_bp
+    from app.routes.incidence_routes import incidence_bp
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(empresa_bp, url_prefix='/api')
-    # app.register_blueprint(incidence_bp, url_prefix='/api')
+    app.register_blueprint(incidence_bp, url_prefix='/api')
 
     return app
