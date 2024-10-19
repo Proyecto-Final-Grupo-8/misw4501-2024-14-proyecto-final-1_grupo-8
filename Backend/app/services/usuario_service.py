@@ -43,7 +43,8 @@ def authenticate_usuario(data):
         return {'message': 'Invalid credentials'}, 401
 
     # Generamos el token de acceso
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(hours=1))
+
 
     # Devolvemos el token, rol del usuario y la empresa a la que pertenece (si tiene)
     return {

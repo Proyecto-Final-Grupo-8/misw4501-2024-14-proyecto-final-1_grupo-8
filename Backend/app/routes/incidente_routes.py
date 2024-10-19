@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.services.incidente_service import IncidenteService
+from app.services.incidente_service import IncidenteService, Incidente
 
 incidente_bp = Blueprint('incidente', __name__)
 
@@ -10,14 +10,20 @@ def create_incidente():
     user_id = get_jwt_identity()
     data = request.json
 
-    incidente = incidente(
-        descripcion=data.get('descripcion'),  # Asegúrate de que sea 'descripcion'
-        cliente_id=user_id,  # Se usa 'cliente_id' en vez de 'created_by'
-        # Asegúrate de agregar el campo "source" si es necesario
+    if not data.get('descripcion'):
+        return jsonify({"message": "descripcion is required"}), 400
+    
+    if data.get('fuente') not in ['web', 'app', 'telefono', 'email']:
+        return jsonify({"message": "fuente is invalid"}), 400
+
+    nuevo_incidente = Incidente(
+        descripcion=data.get('descripcion'), 
+        cliente_id=user_id,
+        fuente=data.get('fuente')
     )
 
-    incidente = IncidenteService.create_incidente(incidente)
-    return jsonify({"message": "incidente created", "incidente": incidente.id}), 201
+    incidente = IncidenteService.create_incidente(nuevo_incidente)
+    return jsonify({"message": "incidente created", "incidente": nuevo_incidente.id}), 201
 
 @incidente_bp.route('/incidente', methods=['GET'])
 def get_all_incidente():

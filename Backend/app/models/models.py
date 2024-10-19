@@ -30,7 +30,8 @@ class Incidente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(500), nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=db.func.now())
-    
+    fuente = db.Column(db.String(20), nullable=False)
+
     # Relación con cliente y analista
     cliente_id = db.Column(db.String(36), db.ForeignKey('usuario.id'), nullable=False)
     analista_id = db.Column(db.String(36), db.ForeignKey('usuario.id'))

@@ -4,11 +4,11 @@ from datetime import datetime
 
 class IncidenteService:
     @staticmethod
-    def create_incidente(incidente):
-        incidente.created_at = datetime.utcnow() 
-        db.session.add(incidente)
+    def create_incidente(nuevo_incidente):
+        nuevo_incidente.created_at = datetime.utcnow() 
+        db.session.add(nuevo_incidente)
         db.session.commit()
-        return incidente
+        return nuevo_incidente
 
     @staticmethod
     def get_all_incidente():
