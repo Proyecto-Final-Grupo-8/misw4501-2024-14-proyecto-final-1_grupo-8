@@ -7,4 +7,4 @@ api_bp = Blueprint('api', __name__)
 
 api_bp.register_blueprint(user_bp)
 api_bp.register_blueprint(empresa_bp)
-api_bp.register_blueprint(incidence_bp)  # Registrar las rutas de incidencias
+api_bp.register_blueprint(incidence_bp)  # Registrar las rutas de Incidences

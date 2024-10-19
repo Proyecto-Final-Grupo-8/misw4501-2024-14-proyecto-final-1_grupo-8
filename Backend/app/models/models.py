@@ -14,9 +14,9 @@ class User(db.Model):
     # Rol del usuario: cliente, analista, o empresa
     role = db.Column(db.String(20), nullable=False)
     
-    # Relación con el modelo de incidencias (solo si es cliente o analista)
-    incidencias_cliente = db.relationship('Incidencia', backref='cliente', lazy=True, foreign_keys='Incidencia.cliente_id')
-    incidencias_analista = db.relationship('Incidencia', backref='analista', lazy=True, foreign_keys='Incidencia.analista_id')
+    # Relación con el modelo de Incidences (solo si es cliente o analista)
+    Incidences_cliente = db.relationship('Incidence', backref='cliente', lazy=True, foreign_keys='Incidence.cliente_id')
+    Incidences_analista = db.relationship('Incidence', backref='analista', lazy=True, foreign_keys='Incidence.analista_id')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -24,9 +24,9 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Modelo de Incidencia
-class Incidencia(db.Model):
-    __tablename__ = 'incidencia'
+# Modelo de Incidence
+class Incidence(db.Model):
+    __tablename__ = 'Incidence'
     id = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(500), nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=db.func.now())
@@ -35,27 +35,27 @@ class Incidencia(db.Model):
     cliente_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
     analista_id = db.Column(db.String(36), db.ForeignKey('user.id'))
 
-    # Estado de la incidencia
+    # Estado de la Incidence
     estado = db.Column(db.String(20), nullable=False, default='Abierto')
 
     # Relación uno a muchos con el Log de Incidentes
-    logs = db.relationship('LogIncidente', backref='incidencia', lazy=True, cascade="all, delete")
+    logs = db.relationship('IncidenceLog', backref='Incidence', lazy=True, cascade="all, delete")
 
     def asignar_analista(self, analista):
         self.analista_id = analista.id
         self.estado = 'En Proceso'
 
-    def cerrar_incidencia(self):
+    def cerrar_Incidence(self):
         self.estado = 'Cerrado'
 
 # Modelo de Log de Incidente
-class LogIncidente(db.Model):
-    __tablename__ = 'log_incidencia'
+class IncidenceLog(db.Model):
+    __tablename__ = 'log_Incidence'
     id = db.Column(db.Integer, primary_key=True)
     detalle = db.Column(db.Text, nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=db.func.now())
     usuario_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
-    incidencia_id = db.Column(db.Integer, db.ForeignKey('incidencia.id'), nullable=False)
+    Incidence_id = db.Column(db.Integer, db.ForeignKey('Incidence.id'), nullable=False)
 
 # Modelo Contrato
 class Contrato(db.Model):
