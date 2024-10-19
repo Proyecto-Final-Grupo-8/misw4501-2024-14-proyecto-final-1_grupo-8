@@ -1,10 +1,10 @@
 from flask import Blueprint
-from .user_routes import user_bp
+from .usuario_routes import usuario_bp
 from .empresa_routes import empresa_bp
-from .incidence_routes import incidence_bp  # Importar las nuevas rutas
+from .incidente_routes import incidente_bp  # Importar las nuevas rutas
 
 api_bp = Blueprint('api', __name__)
 
-api_bp.register_blueprint(user_bp)
+api_bp.register_blueprint(usuario_bp)
 api_bp.register_blueprint(empresa_bp)
-api_bp.register_blueprint(incidence_bp)  # Registrar las rutas de Incidences
+api_bp.register_blueprint(incidente_bp)  # Registrar las rutas de incidente
