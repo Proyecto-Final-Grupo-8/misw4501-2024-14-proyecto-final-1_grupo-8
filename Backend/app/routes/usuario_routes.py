@@ -1,7 +1,5 @@
-# app/routes/user_routes.py
-
 from flask import Blueprint, jsonify, request
-from app.services.usuario_service import create_user, authenticate_user, get_user_info
+from app.services.usuario_service import create_usuario, authenticate_usuario, get_usuario_info
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 usuario_bp = Blueprint('usuario_bp', __name__)
@@ -10,22 +8,22 @@ usuario_bp = Blueprint('usuario_bp', __name__)
 @usuario_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    return create_user(data)
+    return create_usuario(data)
 
 # Autenticación de un usuario (login)
 @usuario_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    return authenticate_user(data)
+    return authenticate_usuario(data)
 
 # Obtener la información del usuario autenticado
-@usuario_bp.route('/user_info', methods=['GET'])
+@usuario_bp.route('/usuario_info', methods=['GET'])
 @jwt_required()
-def user_info():
-    current_user_id = get_jwt_identity()
-    return get_user_info(current_user_id)
+def usuario_info():
+    current_usuario_id = get_jwt_identity()
+    return get_usuario_info(current_usuario_id)
 
 
 @usuario_bp.route('/ping', methods=['GET'])
-def user_ping():
+def usuario_ping():
     return {"message": "health"}

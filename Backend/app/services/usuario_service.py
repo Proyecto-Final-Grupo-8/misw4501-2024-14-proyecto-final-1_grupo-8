@@ -1,11 +1,11 @@
-# app/services/user_service.py
+# app/services/usuario_service.py
 
 from app.models.models import usuario, empresa, contrato
 from app import db
 from flask_jwt_extended import create_access_token
 import datetime
 
-def create_user(data):
+def create_usuario(data):
     username = data.get('username')
     password = data.get('password')
     role = data.get('role')  # Nuevo: Especificamos el rol
@@ -28,14 +28,14 @@ def create_user(data):
         empresa = None  # companies no tienen empresa asociada
 
     # Creamos el nuevo usuario
-    new_user = usuario(username=username, role=role, empresa=empresa)
-    new_user.set_password(password)
-    db.session.add(new_user)
+    new_usuario = usuario(username=username, role=role, empresa=empresa)
+    new_usuario.set_password(password)
+    db.session.add(new_usuario)
     db.session.commit()
 
     return {'message': 'usuario created successfully'}, 201
 
-def authenticate_user(data):
+def authenticate_usuario(data):
     username = data.get('username')
     password = data.get('password')
 
@@ -54,8 +54,8 @@ def authenticate_user(data):
         'empresa': usuario.empresa.nombre if usuario.empresa else None
     }, 200
 
-def get_user_info(user_id):
-    usuario = usuario.query.get(user_id)
+def get_usuario_info(usuario_id):
+    usuario = usuario.query.get(usuario_id)
 
     if not usuario:
         return {'message': 'usuario not found'}, 404
