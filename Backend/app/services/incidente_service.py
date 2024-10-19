@@ -1,31 +1,26 @@
-from app.models.models import incidente, incidenteLog
+from app.models.models import Incidente, IncidenteLog
 from app.extensions import db
 from datetime import datetime
 
-class incidenteervice:
+class IncidenteService:
     @staticmethod
-    def create_incidente(data):
-        incidente = incidente(
-            title=data.get('title'),
-            description=data.get('description'),
-            created_by=data.get('created_by'),
-            created_at=datetime.utcnow()
-        )
+    def create_incidente(incidente):
+        incidente.created_at = datetime.utcnow() 
         db.session.add(incidente)
         db.session.commit()
         return incidente
 
     @staticmethod
     def get_all_incidente():
-        return incidente.query.all()
+        return Incidente.query.all()
 
     @staticmethod
     def get_incidente_by_id(incidente_id):
-        return incidente.query.get_or_404(incidente_id)
+        return Incidente.query.get_or_404(incidente_id)
 
     @staticmethod
     def create_incidente_log(incidente_id, data):
-        incidente_log = incidenteLog(
+        incidente_log = IncidenteLog(
             incidente_id=incidente_id,
             detail=data.get('detail'),
             created_by=data.get('created_by'),
@@ -37,4 +32,4 @@ class incidenteervice:
 
     @staticmethod
     def get_logs_for_incidente(incidente_id):
-        return incidenteLog.query.filter_by(incidente_id=incidente_id).all()
+        return IncidenteLog.query.filter_by(incidente_id=incidente_id).all()

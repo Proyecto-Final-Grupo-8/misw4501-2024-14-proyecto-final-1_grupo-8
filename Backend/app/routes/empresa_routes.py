@@ -1,7 +1,7 @@
 # app/routes/empresa_routes.py
 
 from flask import Blueprint, jsonify, request
-from app.models.models import empresa
+from app.models.models import Empresa
 from app import db
 from app.services.usuario_service import create_contrato_and_empresa
 
@@ -13,10 +13,10 @@ def register_empresa():
     nombre = data.get('nombre')
     contrato_id = data.get('contrato_id')  # Suponemos que el contrato ya está creado
 
-    if empresa.query.filter_by(nombre=nombre).first():
+    if Empresa.query.filter_by(nombre=nombre).first():
         return {'message': 'empresa already exists'}, 400
 
-    new_empresa = empresa(nombre=nombre, contrato_id=contrato_id)
+    new_empresa = Empresa(nombre=nombre, contrato_id=contrato_id)
     db.session.add(new_empresa)
     db.session.commit()
 

@@ -1,6 +1,6 @@
 # app/services/usuario_service.py
 
-from app.models.models import usuario, empresa, contrato
+from app.models.models import Usuario, Empresa, Contrato
 from app import db
 from flask_jwt_extended import create_access_token
 import datetime
@@ -12,7 +12,7 @@ def create_usuario(data):
     empresa_id = data.get('empresa_id')  # Especificamos la empresa (para cliente y analista)
 
     # Validamos si el usuario ya existe
-    if usuario.query.filter_by(username=username).first():
+    if Usuario.query.filter_by(username=username).first():
         return {'message': 'usuario already exists'}, 400
 
     # Validamos si el rol es válido
@@ -21,12 +21,12 @@ def create_usuario(data):
 
     empresa_obj = None  # Aquí cambiamos el nombre de la variable local
     if role != 'empresa':
-        empresa_obj = empresa.query.filter_by(id=empresa_id).first()
+        empresa_obj = Empresa.query.filter_by(id=empresa_id).first()
         if not empresa_obj:
             return {'message': 'empresa not found'}, 404
 
     # Creamos el nuevo usuario
-    new_user = usuario(username=username, role=role, empresa=empresa_obj)
+    new_user = Usuario(username=username, role=role, empresa=empresa_obj)
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
@@ -37,7 +37,7 @@ def authenticate_usuario(data):
     username = data.get('username')
     password = data.get('password')
 
-    user = usuario.query.filter_by(username=username).first()
+    user = Usuario.query.filter_by(username=username).first()
 
     if not user or not user.check_password(password):
         return {'message': 'Invalid credentials'}, 401
@@ -82,11 +82,11 @@ def create_contrato_and_empresa(data):
         return {'message': 'Invalid date format. Use YYYY-MM-DD'}, 400
     
     # Verificar si la empresa ya existe
-    if empresa.query.filter_by(nombre=nombre_empresa).first():
+    if Empresa.query.filter_by(nombre=nombre_empresa).first():
         return {'message': 'empresa already exists'}, 400
 
     # Crear el contrato
-    new_contrato = contrato(
+    new_contrato = Contrato(
         descripcion=descripcion,
         fecha_inicio=fecha_inicio,
         fecha_fin=fecha_fin
@@ -96,7 +96,7 @@ def create_contrato_and_empresa(data):
     db.session.commit()
 
     # Crear la empresa asociada
-    new_empresa = empresa(
+    new_empresa = Empresa(
         nombre=nombre_empresa,
         contrato_id=new_contrato.id
     )
