@@ -8,8 +8,8 @@ import datetime
 def create_usuario(data):
     username = data.get('username')
     password = data.get('password')
-    role = data.get('role')  # Nuevo: Especificamos el rol
-    empresa_id = data.get('empresa_id')  # Nuevo: Especificamos la empresa (para cliente y analista)
+    role = data.get('role')  # Especificamos el rol
+    empresa_id = data.get('empresa_id')  # Especificamos la empresa (para cliente y analista)
 
     # Validamos si el usuario ya existe
     if usuario.query.filter_by(username=username).first():
@@ -19,18 +19,16 @@ def create_usuario(data):
     if role not in ['empresa', 'cliente', 'analista']:
         return {'message': 'Invalid role specified'}, 400
 
-    # Si el rol no es 'empresa', necesitamos asociar el usuario a una empresa existente
+    empresa_obj = None  # Aquí cambiamos el nombre de la variable local
     if role != 'empresa':
-        empresa = empresa.query.filter_by(id=empresa_id).first()
-        if not empresa:
+        empresa_obj = empresa.query.filter_by(id=empresa_id).first()
+        if not empresa_obj:
             return {'message': 'empresa not found'}, 404
-    else:
-        empresa = None  # companies no tienen empresa asociada
 
     # Creamos el nuevo usuario
-    new_usuario = usuario(username=username, role=role, empresa=empresa)
-    new_usuario.set_password(password)
-    db.session.add(new_usuario)
+    new_user = usuario(username=username, role=role, empresa=empresa_obj)
+    new_user.set_password(password)
+    db.session.add(new_user)
     db.session.commit()
 
     return {'message': 'usuario created successfully'}, 201
@@ -39,19 +37,19 @@ def authenticate_usuario(data):
     username = data.get('username')
     password = data.get('password')
 
-    usuario = usuario.query.filter_by(username=username).first()
+    user = usuario.query.filter_by(username=username).first()
 
-    if not usuario or not usuario.check_password(password):
+    if not user or not user.check_password(password):
         return {'message': 'Invalid credentials'}, 401
 
     # Generamos el token de acceso
-    access_token = create_access_token(identity=usuario.id)
+    access_token = create_access_token(identity=user.id)
 
     # Devolvemos el token, rol del usuario y la empresa a la que pertenece (si tiene)
     return {
         'access_token': access_token,
-        'role': usuario.role,
-        'empresa': usuario.empresa.nombre if usuario.empresa else None
+        'role': user.role,
+        'empresa': user.empresa.nombre if user.empresa else None
     }, 200
 
 def get_usuario_info(usuario_id):

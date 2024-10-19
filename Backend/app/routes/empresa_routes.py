@@ -22,7 +22,7 @@ def register_empresa():
 
     return {'message': 'empresa created successfully'}, 201
 
-@empresa_bp.route('/create_contrato', methods=['POST'])
+@empresa_bp.route('/create_contract', methods=['POST'])
 def create_contrato():
     data = request.get_json()
     return create_contrato_and_empresa(data)
