@@ -1,7 +1,6 @@
 # app/services/user_service.py
 
-from app.models.user import User
-from app.models.empresas import Empresa, Contrato
+from app.models.models import User, Empresa, Contrato
 from app import db
 from flask_jwt_extended import create_access_token
 import datetime

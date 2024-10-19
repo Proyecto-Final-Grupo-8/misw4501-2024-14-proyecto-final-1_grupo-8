@@ -1,4 +1,2 @@
 # from .incidence import Incidence
-from .contrato import Contrato
-from .empresas import Empresa
-from .user import User
+from .models import db, User, Incidencia, LogIncidente, Contrato, Empresa

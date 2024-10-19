@@ -1,7 +1,7 @@
 # app/routes/empresa_routes.py
 
 from flask import Blueprint, jsonify, request
-from app.models.empresas import Empresa
+from app.models.models import Empresa
 from app import db
 from app.services.user_service import create_contract_and_empresa
 
