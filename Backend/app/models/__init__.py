@@ -1,3 +1,4 @@
 # from .incidence import Incidence
-from .user import User 
+from .contrato import Contrato
 from .empresas import Empresa
+from .user import User

@@ -1,9 +1,24 @@
-# from app import db
-# from sqlalchemy.sql import func
-# import uuid
+from app import db
+from sqlalchemy.sql import func
+import uuid
 
-# class Incidence(db.Model):
-#     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-#     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=False)
-#     creation_date = db.Column(db.Date, default=func.current_date()) 
-#     description = db.Column(db.String(128))
+# Modelo de Incidencia
+class Incidencia(db.Model):
+    __tablename__ = 'incidencia'
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(500), nullable=False)
+    fecha_creacion = db.Column(db.DateTime, default=db.func.now())
+    
+    # Relación con cliente y analista
+    cliente_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
+    analista_id = db.Column(db.String(36), db.ForeignKey('user.id'))
+
+    # Estado de la incidencia
+    estado = db.Column(db.String(20), nullable=False, default='Abierto')
+
+    def asignar_analista(self, analista):
+        self.analista_id = analista.id
+        self.estado = 'En Proceso'
+
+    def cerrar_incidencia(self):
+        self.estado = 'Cerrado'
