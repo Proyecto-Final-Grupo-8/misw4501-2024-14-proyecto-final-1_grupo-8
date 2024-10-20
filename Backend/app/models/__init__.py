@@ -1,2 +1,2 @@
-# from .incidente import incidente
+# from .incident import incident
 from .models import *
