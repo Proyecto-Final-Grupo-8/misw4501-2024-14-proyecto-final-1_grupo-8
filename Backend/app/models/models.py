@@ -17,6 +17,7 @@ class Usuario(db.Model):
     # Relación con el modelo de incidente (cliente y analista)
     incidente_cliente = db.relationship('Incidente', backref='cliente', lazy=True, foreign_keys='Incidente.cliente_id')
     incidente_analista = db.relationship('Incidente', backref='analista', lazy=True, foreign_keys='Incidente.analista_id')
+    incidente_log = db.relationship('IncidenteLog', backref='usuario', lazy=True, foreign_keys='IncidenteLog.usuario_id')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -30,16 +31,13 @@ class Incidente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(500), nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=db.func.now())
-    fuente = db.Column(db.String(20), nullable=False)
-
-    # Relación con cliente y analista
+    fecha_modificacion = db.Column(db.DateTime, default=db.func.now())
+    fuente = db.Column(db.String(20), nullable=True)
     cliente_id = db.Column(db.String(36), db.ForeignKey('usuario.id'), nullable=False)
     analista_id = db.Column(db.String(36), db.ForeignKey('usuario.id'))
-
-    # Estado del incidente
     estado = db.Column(db.String(20), nullable=False, default='Abierto')
 
-    # Relación uno a muchos con los logs de incidente
+    # Relaciones
     logs = db.relationship('IncidenteLog', backref='incidente', lazy=True, cascade="all, delete")
 
     def asignar_analista(self, analista):
@@ -49,6 +47,18 @@ class Incidente(db.Model):
     def cerrar_incidente(self):
         self.estado = 'Cerrado'
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'descripcion': self.descripcion,
+            'fecha_creacion': self.fecha_creacion,
+            'fuente': self.fuente,
+            'cliente': self.cliente.username,  # Accedemos al cliente correctamente
+            'analista': self.analista.username if self.analista else None,  # Solo mostramos si hay analista
+            'estado': self.estado,
+            'logs': [log.serialize() for log in self.logs] 
+        }
+
 # Modelo de Log de Incidente
 class IncidenteLog(db.Model):
     __tablename__ = 'log_incidente'
@@ -57,6 +67,14 @@ class IncidenteLog(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=db.func.now())
     usuario_id = db.Column(db.String(36), db.ForeignKey('usuario.id'), nullable=False)
     incidente_id = db.Column(db.Integer, db.ForeignKey('incidente.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'detalle': self.detalle,
+            'fecha_creacion': self.fecha_creacion,
+            'usuario': self.usuario.username
+        }
 
 # Modelo de Contrato
 class Contrato(db.Model):
