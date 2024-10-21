@@ -16,7 +16,7 @@ def create_users(data):
         return {'message': 'users already exists'}, 400
 
     # Validamos si el rol es válido
-    if role not in ['company', 'customer', 'analyst']:
+    if role not in ['company', 'customer', 'analyst', 'admin']:
         return {'message': 'Invalid role specified'}, 400
 
     company_obj = None  # Aquí cambiamos el name de la variable local

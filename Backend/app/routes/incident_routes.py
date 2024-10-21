@@ -64,13 +64,13 @@ def update_incident(incident_id):
     if not incident_obj:
         return jsonify({"message": "incident not found"}), 404
     
-    if users.role != 'analyst':
+    if users.role != 'analyst' and users.role != 'admin':
         return jsonify({"message": "you are not allowed to update this incident"}), 403
     
-    if data.get('status') not in ['pendiente', 'en progreso', 'resuelto']:
+    if users.role == 'analyst' and data.get('status') not in ['pendiente', 'en progreso', 'resuelto']:
         return jsonify({"message": "invalid status"}), 400
     
-    IncidentService.update_incident(incident_id, data)  
+    IncidentService.update_incident(users.role,incident_id, data)  
     return jsonify({"message": "incident updated"}), 200
 
 @incident_bp.route('/incident/<int:incident_id>/logs', methods=['POST'])
