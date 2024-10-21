@@ -8,3 +8,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = 'supersecretkey123' #os.getenv('JWT_SECRET_KEY', 'your-secret-key')
 
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+    DEBUG = True
