@@ -25,6 +25,7 @@ class ContractService:
         contract.start_date = contract_data.get('start_date', contract.start_date)
         contract.end_date = contract_data.get('end_date', contract.end_date)
         contract.company_id = contract_data.get('company_id', contract.company_id)
+        contract.plan= contract_data.get('plan', contract.plan)
         db.session.commit()
         return contract
 

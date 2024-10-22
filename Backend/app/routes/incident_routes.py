@@ -39,7 +39,7 @@ def get_all_incident():
     return jsonify([incident.serialize() for incident in incident_obj]), 200
 
 
-@incident_bp.route('/incident/<int:incident_id>', methods=['GET'])
+@incident_bp.route('/incident/<string:incident_id>', methods=['GET'])
 @jwt_required()
 def get_incident_by_id(incident_id):
     user_id = get_jwt_identity()
@@ -53,7 +53,7 @@ def get_incident_by_id(incident_id):
         return jsonify({"message": "incident not found"}), 404
     return jsonify(incident_obj.serialize()), 200
 
-@incident_bp.route('/incident/<int:incident_id>', methods=['PUT'])
+@incident_bp.route('/incident/<string:incident_id>', methods=['PUT'])
 @jwt_required()
 def update_incident(incident_id):
     user_id = get_jwt_identity()
@@ -73,7 +73,7 @@ def update_incident(incident_id):
     IncidentService.update_incident(users.role,incident_id, data)  
     return jsonify({"message": "incident updated"}), 200
 
-@incident_bp.route('/incident/<int:incident_id>/logs', methods=['POST'])
+@incident_bp.route('/incident/<string:incident_id>/logs', methods=['POST'])
 @jwt_required()
 def create_incident_log(incident_id):
     user_id = get_jwt_identity()

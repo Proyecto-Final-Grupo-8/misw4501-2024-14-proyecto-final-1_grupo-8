@@ -6,7 +6,6 @@ from app.services.contract_service import ContractService
 contract_bp = Blueprint('contract', __name__)
 
 @contract_bp.route('/contract', methods=['POST'])
-@jwt_required()
 def create_contract():
     data = request.json
 
@@ -26,37 +25,34 @@ def create_contract():
         description=data.get('description'), 
         start_date=data.get('start_date'),
         end_date=data.get('end_date'),
-        company_id=data.get('company_id')
+        company_id=data.get('company_id'),
+        plan=data.get('plan')
     )
 
     ContractService.create_contract(nuevo_contract)
     return jsonify({"message": "contract created", "contract": nuevo_contract.id}), 201
 
 @contract_bp.route('/contracts', methods=['GET'])
-@jwt_required()
 def get_all_contract():
     contract_obj = ContractService.get_all_contract()
     return jsonify([contract.serialize() for contract in contract_obj]), 200
 
-@contract_bp.route('/contract/<int:contract_id>', methods=['GET'])
-@jwt_required()
+@contract_bp.route('/contract/<string:contract_id>', methods=['GET'])
 def get_contract_by_id(contract_id):
     contract_obj = ContractService.get_contract_by_id(contract_id)
     if not contract_obj:
         return jsonify({"message": "contract not found"}), 404
     return jsonify(contract_obj.serialize()), 200
 
-@contract_bp.route('/contract/<int:contract_id>', methods=['PUT'])
-@jwt_required()
+@contract_bp.route('/contract/<string:contract_id>', methods=['PUT'])
 def update_contract(contract_id):
     data = request.json
     contract_obj = ContractService.update_contract(contract_id, data)
     if not contract_obj:
         return jsonify({"message": "contract not found"}), 404
-    return jsonify(contract_obj.serialize()), 200
+    return jsonify({"message":"contract updated","contract":contract_obj.serialize()}), 200
 
-@contract_bp.route('/contract/<int:contract_id>', methods=['DELETE'])
-@jwt_required()
+@contract_bp.route('/contract/<string:contract_id>', methods=['DELETE'])
 def delete_contract(contract_id):
     contract_obj = ContractService.delete_contract(contract_id)
     if not contract_obj:
