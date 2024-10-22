@@ -1,6 +1,6 @@
 # app/services/users_service.py
 
-from app.models.models import Users, Company, Contrac
+from app.models.models import Users, Company, Contract
 from app import db
 from flask_jwt_extended import create_access_token
 import datetime
@@ -16,7 +16,7 @@ def create_users(data):
         return {'message': 'users already exists'}, 400
 
     # Validamos si el rol es válido
-    if role not in ['company', 'customer', 'analyst']:
+    if role not in ['company', 'customer', 'analyst', 'admin']:
         return {'message': 'Invalid role specified'}, 400
 
     company_obj = None  # Aquí cambiamos el name de la variable local
@@ -54,7 +54,7 @@ def authenticate_users(data):
     }, 200
 
 def get_users_info(users_id):
-    users = users.query.get(users_id)
+    users = Users.query.get(users_id)
 
     if not users:
         return {'message': 'users not found'}, 404
@@ -65,6 +65,7 @@ def get_users_info(users_id):
         'role': users.role,
         'company': users.company.name if users.company else None
     }, 200
+
 
 def create_contrac_and_company(data):
     # Información del contrac
@@ -87,7 +88,7 @@ def create_contrac_and_company(data):
         return {'message': 'company already exists'}, 400
 
     # Crear el contrac
-    new_contrac = Contrac(
+    new_contrac = Contract(
         description=description,
         start_date=start_date,
         end_date=end_date

@@ -28,7 +28,7 @@ class Users(db.Model):
 # Modelo de Incident
 class Incident(db.Model):
     __tablename__ = 'incident'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     description = db.Column(db.String(500), nullable=False)
     created_date = db.Column(db.DateTime, default=db.func.now())
     modified_date = db.Column(db.DateTime, default=db.func.now())
@@ -62,38 +62,69 @@ class Incident(db.Model):
 # Modelo de Log de Incident
 class IncidentLog(db.Model):
     __tablename__ = 'log_incident'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     details = db.Column(db.Text, nullable=False)
     created_date = db.Column(db.DateTime, default=db.func.now())
     users_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'), nullable=False)
+    incident_id = db.Column(db.String(36), db.ForeignKey('incident.id'), nullable=False)  # Corregido a String(36)
 
     def serialize(self):
         return {
             'id': self.id,
             'details': self.details,
             'created_date': self.created_date,
-            'users': self.users.username
+            'user': self.users.username  # Cambiado 'users' a 'user'
         }
 
-# Modelo de Contrac
-class Contrac(db.Model):
-    __tablename__ = 'contrac'
-    id = db.Column(db.Integer, primary_key=True)
+# Modelo de Contract
+class Contract(db.Model):
+    __tablename__ = 'contract'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     description = db.Column(db.String(200), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
+    plan = db.Column(db.String(20), nullable=False)
+    company_id = db.Column(db.String(36), db.ForeignKey('company.id'), nullable=False)
+
+    company = db.relationship('Company', backref='contracts')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'description': self.description,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'company': self.company.name
+        }
 
 # Modelo de Company
 class Company(db.Model):
     __tablename__ = 'company'
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(100), unique=True, nullable=False)
-    contrac_id = db.Column(db.Integer, db.ForeignKey('contrac.id'), nullable=False)
     users = db.relationship('Users', backref='company', lazy=True)
+    created_date = db.Column(db.DateTime, default=db.func.now())
 
     def serialize(self):
         return {
             'id': self.id,
             'name': self.name
+        }
+
+# Modelo de Rates
+class Rates(db.Model):
+    __tablename__ = 'rates'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    rate = db.Column(db.Float, nullable=False)
+    rate_per_incident = db.Column(db.Float, nullable=False)
+    id_contract = db.Column(db.String(36), db.ForeignKey('contract.id'), nullable=False)
+    source = db.Column(db.String(20), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'rate': self.rate,
+            'rate_per_incident': self.rate_per_incident,
+            'contract': self.id_contract,
+            'source': self.source
         }

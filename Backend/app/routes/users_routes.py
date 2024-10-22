@@ -17,12 +17,11 @@ def login():
     return authenticate_users(data)
 
 # Obtener la información del users autenticado
-@users_bp.route('/users_info', methods=['GET'])
+@users_bp.route('/user', methods=['GET'])
 @jwt_required()
 def users_info():
     current_users_id = get_jwt_identity()
     return get_users_info(current_users_id)
-
 
 @users_bp.route('/ping', methods=['GET'])
 def users_ping():
