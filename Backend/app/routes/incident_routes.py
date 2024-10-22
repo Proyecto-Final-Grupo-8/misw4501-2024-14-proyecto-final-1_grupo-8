@@ -73,6 +73,23 @@ def update_incident(incident_id):
     IncidentService.update_incident(users.role,incident_id, data)  
     return jsonify({"message": "incident updated"}), 200
 
+@incident_bp.route('/incident/<string:incident_id>', methods=['DELETE'])
+@jwt_required()
+def delete_incident(incident_id):
+    user_id = get_jwt_identity()
+    users = Users.query.get(user_id)
+    incident_obj = Incident.query.filter_by(id=incident_id).first()
+
+    if not incident_obj:
+        return jsonify({"message": "incident not found"}), 404
+    
+    if users.role != 'admin':
+        return jsonify({"message": "you are not allowed to delete this incident"}), 403
+    
+    IncidentService.delete_incident(incident_id)
+    return jsonify({"message": "incident deleted"}), 200
+
+
 @incident_bp.route('/incident/<string:incident_id>/logs', methods=['POST'])
 @jwt_required()
 def create_incident_log(incident_id):
@@ -100,3 +117,79 @@ def create_incident_log(incident_id):
     log=IncidentService.create_incident_log(nuevo_log)
     return jsonify({"message": "incident log created", "log": log.id}), 201
 
+
+@incident_bp.route('/incident/<string:incident_id>/logs', methods=['GET'])
+@jwt_required()
+def get_logs_for_incident(incident_id):
+    user_id = get_jwt_identity()
+    users = Users.query.get(user_id)
+    Incident_obj = Incident.query.filter_by(id=incident_id).first()
+
+    if not users:
+        return jsonify({"message": "users not found"}), 404
+    
+    if not Incident_obj:
+        return jsonify({"message": "incident not found"}), 404
+
+    logs = IncidentService.get_logs_for_incident(incident_id)
+    return jsonify([log.serialize() for log in logs]), 200
+
+@incident_bp.route('/incident/<string:incident_id>/logs/<string:log_id>', methods=['GET'])
+@jwt_required()
+def get_log_by_id(incident_id, log_id):
+    user_id = get_jwt_identity()
+    users = Users.query.get(user_id)
+    Incident_obj = Incident.query.filter_by(id=incident_id).first()
+    log_obj = IncidentLog.query.filter_by(id=log_id).first()
+
+    if not users:
+        return jsonify({"message": "users not found"}), 404
+    
+    if not Incident_obj:
+        return jsonify({"message": "incident not found"}), 404
+    
+    if not log_obj:
+        return jsonify({"message": "log not found"}), 404
+
+    return jsonify(log_obj.serialize()), 200
+
+@incident_bp.route('/incident/<string:incident_id>/logs/<string:log_id>', methods=['PUT'])
+@jwt_required()
+def update_log(incident_id, log_id):
+    user_id = get_jwt_identity()
+    data = request.json
+    users = Users.query.get(user_id)
+    Incident_obj = Incident.query.filter_by(id=incident_id).first()
+    log_obj = IncidentLog.query.filter_by(id=log_id).first()
+
+    if not users:
+        return jsonify({"message": "users not found"}), 404
+    
+    if not Incident_obj:
+        return jsonify({"message": "incident not found"}), 404
+    
+    if not log_obj:
+        return jsonify({"message": "log not found"}), 404
+
+    IncidentService.update_log(log_id, data)
+    return jsonify({"message": "log updated"}), 200
+
+@incident_bp.route('/incident/<string:incident_id>/logs/<string:log_id>', methods=['DELETE'])
+@jwt_required()
+def delete_log(incident_id, log_id):
+    user_id = get_jwt_identity()
+    users = Users.query.get(user_id)
+    Incident_obj = Incident.query.filter_by(id=incident_id).first()
+    log_obj = IncidentLog.query.filter_by(id=log_id).first()
+
+    if not users:
+        return jsonify({"message": "users not found"}), 404
+    
+    if not Incident_obj:
+        return jsonify({"message": "incident not found"}), 404
+    
+    if not log_obj:
+        return jsonify({"message": "log not found"}), 404
+
+    IncidentService.delete_log(log_id)
+    return jsonify({"message": "log deleted"}), 200

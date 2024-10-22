@@ -46,7 +46,16 @@ class IncidentService:
             incident.status = data.get('status', incident.status)
             db.session.commit()
             return None
-
+        
+    @staticmethod
+    def delete_incident(incident_id):
+        incident = Incident.query.get(incident_id)
+        if not incident:
+            return None
+        db.session.delete(incident)
+        db.session.commit()
+        return None
+    
     @staticmethod
     def create_incident_log(nuevo_log):
         nuevo_log.created_at = datetime.utcnow()
@@ -57,3 +66,25 @@ class IncidentService:
     @staticmethod
     def get_logs_for_incident(incident_id):
         return IncidentLog.query.filter_by(incident_id=incident_id).all()
+    
+    @staticmethod
+    def get_log_by_id(log_id):
+        return IncidentLog.query.get(log_id)
+    
+    @staticmethod
+    def update_log(log_id, data):
+        log = IncidentLog.query.get(log_id)
+        if not log:
+            return None
+        log.details = data.get('details', log.details)
+        db.session.commit()
+        return log
+    
+    @staticmethod
+    def delete_log(log_id):
+        log = IncidentLog.query.get(log_id)
+        if not log:
+            return None
+        db.session.delete(log)
+        db.session.commit()
+        return None
