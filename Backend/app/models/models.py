@@ -24,6 +24,14 @@ class Users(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'role': self.role,
+            'company': self.company.name
+        }
 
 # Modelo de Incident
 class Incident(db.Model):
@@ -129,58 +137,59 @@ class Rates(db.Model):
             'source': self.source
         }
     
-#Modelo de Facturas
-# class Invoices(db.Model):
-#     __tablename__ = 'invoices'
-#     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-#     amount = db.Column(db.Float, nullable=False)
-#     id_contract = db.Column(db.String(36), db.ForeignKey('contract.id'), nullable=False)
-#     created_date = db.Column(db.DateTime, default=db.func.now())
+# Modelo de Facturas
+class Invoices(db.Model):
+    __tablename__ = 'invoices'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    amount = db.Column(db.Float, nullable=False)
+    id_contract = db.Column(db.String(36), db.ForeignKey('contract.id'), nullable=False)
+    company_id = db.Column(db.String(36), db.ForeignKey('company.id'), nullable=False)  # Añadida clave foránea a Company
+    created_date = db.Column(db.DateTime, default=db.func.now())
 
-#     Company = db.relationship('Company', backref='invoices', lazy=True)
+    company = db.relationship('Company', backref='invoices', lazy=True)
 
-#     def serialize(self):
-#         return {
-#             'id': self.id,
-#             'amount': self.amount,
-#             'contract': self.id_contract,
-#             'created_date': self.created_date,
-#             'company': self.company.name           
-#         }
-
-# class LogInvoices(db.Model):
-#     __tablename__ = 'log_invoices'
-#     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-#     amount = db.Column(db.Float, nullable=False)
-#     id_invoice = db.Column(db.String(36), db.ForeignKey('invoices.id'), nullable=False)
-#     created_date = db.Column(db.DateTime, default=db.func.now())
-#     quantity = db.Column(db.Integer, nullable=False)
-#     description = db.Column(db.String(200), nullable=False)
-#     source = db.Column(db.String(20), nullable=False)
-
-
-#     def serialize(self):
-#         return {
-#             'id': self.id,
-#             'amount': self.amount,
-#             'invoice': self.id_invoice,
-#             'created_date': self.created_date,
-#             'quantity': self.quantity,
-#             'description': self.description,
-#             'source': self.source
-#         }
+    def serialize(self):
+        return {
+            'id': self.id,
+            'amount': self.amount,
+            'contract': self.id_contract,
+            'created_date': self.created_date,
+            'company': self.company.name
+        }
     
-# class CompanyServices(db.Model):
-#     __tablename__ = 'company_services'
-#     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-#     description = db.Column(db.String(200), nullable=False)
-#     id_company = db.Column(db.String(36), db.ForeignKey('company.id'), nullable=False)
-#     created_date = db.Column(db.DateTime, default=db.func.now())
+class LogInvoices(db.Model):
+    __tablename__ = 'log_invoices'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    amount = db.Column(db.Float, nullable=False)
+    id_invoice = db.Column(db.String(36), db.ForeignKey('invoices.id'), nullable=False)
+    created_date = db.Column(db.DateTime, default=db.func.now())
+    quantity = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    source = db.Column(db.String(20), nullable=False)
 
-#     def serialize(self):
-#         return {
-#             'id': self.id,
-#             'description': self.description,
-#             'company': self.id_company,
-#             'created_date': self.created_date
-#         }
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'amount': self.amount,
+            'invoice': self.id_invoice,
+            'created_date': self.created_date,
+            'quantity': self.quantity,
+            'description': self.description,
+            'source': self.source
+        }
+    
+class CompanyServices(db.Model):
+    __tablename__ = 'company_services'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    description = db.Column(db.String(200), nullable=False)
+    id_company = db.Column(db.String(36), db.ForeignKey('company.id'), nullable=False)
+    created_date = db.Column(db.DateTime, default=db.func.now())
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'description': self.description,
+            'company': self.id_company,
+            'created_date': self.created_date
+        }
