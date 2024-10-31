@@ -2,7 +2,7 @@
 
 from app.models.models import Users, Company, Contract
 from app import db
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 import datetime
 import re
 
@@ -48,11 +48,13 @@ class UsersService:
 
         # Generamos el token de acceso
         access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(hours=1))
+        refresh_token = create_refresh_token(identity=user.id)
 
 
         # Devolvemos el token, rol del users y la company a la que pertenece (si tiene)
         return {
             'access_token': access_token,
+            'refresh_token': refresh_token,
             'role': user.role,
             'company': user.company.name if user.company else None
         }, 200

@@ -1,6 +1,7 @@
+import datetime
 from flask import Blueprint, jsonify, request
 from app.services.users_service import UsersService
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 
 users_bp = Blueprint('users_bp', __name__)
 
@@ -31,3 +32,10 @@ def update_users(users_id):
 @users_bp.route('user/<string:users_id>', methods=['DELETE'])
 def delete_users(users_id):
     return UsersService.delete_users(users_id)
+
+@users_bp.route('user/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    current_users_id = get_jwt_identity()
+    new_access_token = create_access_token(identity=current_users_id, expires_delta=datetime.timedelta(hours=1))
+    return jsonify(access_token=new_access_token), 200
