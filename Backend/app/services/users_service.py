@@ -13,6 +13,10 @@ class UsersService:
         password = data.get('password')
         role = data.get('role')  # Especificamos el rol
         company_id = data.get('company_id')  # Especificamos la company (para customer y analyst)
+        email = data.get('email')
+        phone = data.get('phone')
+        name = data.get('name')
+        last_name = data.get('last_name')
 
         # Validamos si el users ya existe
         if Users.query.filter_by(username=username).first():
@@ -27,9 +31,9 @@ class UsersService:
             company_obj = Company.query.filter_by(id=company_id).first()
             if not company_obj:
                 return {'message': 'company not found'}, 404
-
+            
         # Creamos el nuevo users
-        new_user = Users(username=username, role=role, company=company_obj)
+        new_user = Users(username=username, role=role, company=company_obj, email=email, phone=phone, name=name, last_name=last_name)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()

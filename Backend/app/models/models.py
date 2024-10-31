@@ -10,6 +10,10 @@ class Users(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(1024))
     company_id = db.Column(db.String(36), db.ForeignKey('company.id'), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    name = db.Column(db.String(80), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
     
     # Rol del users: customer, analyst, o company
     role = db.Column(db.String(20), nullable=False)

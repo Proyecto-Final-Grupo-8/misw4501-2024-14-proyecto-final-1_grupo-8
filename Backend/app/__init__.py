@@ -23,11 +23,13 @@ def create_app(config_name=None):
     from app.routes.incident_routes import incident_bp
     from app.routes.contract_routes import contract_bp
     from app.routes.rate_routes import rate_bp
+    from app.routes.status_routes import status_bp
 
     app.register_blueprint(users_bp, url_prefix='/api')
     app.register_blueprint(company_bp, url_prefix='/api')
     app.register_blueprint(incident_bp, url_prefix='/api')
     app.register_blueprint(contract_bp, url_prefix='/api')
     app.register_blueprint(rate_bp, url_prefix='/api')
+    app.register_blueprint(status_bp)
 
     return app
