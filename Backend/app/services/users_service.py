@@ -75,7 +75,12 @@ class UsersService:
             'id': users.id,
             'username': users.username,
             'role': users.role,
-            'company': users.company.name if users.company else None
+            'company': users.company.name if users.company else None,
+            'email': users.email,
+            'phone': users.phone,
+            'name': users.name,
+            'last_name': users.last_name
+
         }, 200
 
     @staticmethod
@@ -99,7 +104,7 @@ class UsersService:
             return {'message': 'users not found'}, 404
         
         if 'password' in data:
-            new_password = data.get('password')
+            new_password = data.get('password')        
             
             if not re.fullmatch(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,16}$', new_password):
                 return {
@@ -107,6 +112,19 @@ class UsersService:
                 }, 400
             
             users.set_password(new_password)
+        
+        if 'email' in data and re.match(r"[^@]+@[^@]+\.[^@]+", data.get('email', '')):            
+            users.email = data.get('email')
+        
+        if 'phone' in data and re.match(r"^\d{10,11}$", data.get('phone', '')):
+            users.phone = data.get('phone')
+
+        if 'name' in data and re.match(r"^[a-zA-Z\s]+$", data.get('name', '')): 
+            users.name = data.get('name')
+
+        if 'last_name' in data and re.match(r"^[a-zA-Z\s]+$", data.get('last_name', '')):
+            users.last_name = data.get('last_name')
+
 
         db.session.commit()
 
