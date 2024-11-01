@@ -17,13 +17,13 @@ class UsersServiceTestCase(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        """Limpia después de cada prueba."""
+        #Limpia después de cada prueba.
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
 
     def test_register_successful(self):
-        """Prueba de registro de usuario exitoso."""
+        #Prueba de registro de usuario exitoso.
         data = {
             'username': 'testuser',
             'password': 'Test@1234',
@@ -41,7 +41,7 @@ class UsersServiceTestCase(unittest.TestCase):
         self.assertIn('users created successfully', response_data['message'])
 
     def test_register_missing_fields(self):
-        """Prueba de error por campos faltantes en registro."""
+        #Prueba de error por campos faltantes en registro.
         data = {
             'username': 'testuser',
             'password': 'Test@1234'
@@ -54,7 +54,7 @@ class UsersServiceTestCase(unittest.TestCase):
         self.assertIn('role is required', response_data['message'])
 
     def test_register_invalid_email(self):
-        """Prueba de error por email inválido en registro."""
+        #Prueba de error por email inválido en registro.
         data = {
             'username': 'testuser',
             'password': 'Test@1234',
@@ -72,7 +72,7 @@ class UsersServiceTestCase(unittest.TestCase):
         self.assertIn('Invalid email', response_data['message'])
 
     def test_login_success(self):
-        """Prueba de autenticación exitosa."""
+        #Prueba de autenticación exitosa.
         # Primero registrar un usuario
         data = {
             'username': 'testuser',
@@ -95,7 +95,7 @@ class UsersServiceTestCase(unittest.TestCase):
         self.assertIn('access_token', response_data)
 
     def test_login_invalid_credentials(self):
-        """Prueba de error por credenciales inválidas en login."""
+        #Prueba de error por credenciales inválidas en login.
         login_data = {'username': 'wronguser', 'password': 'wrongpassword'}
         response = self.client.post('/api/login', json=login_data)
         response_data = response.get_json()
