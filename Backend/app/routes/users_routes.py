@@ -55,6 +55,10 @@ def users_info():
     current_users_id = get_jwt_identity()
     return UsersService.get_users_info(current_users_id)
 
+@users_bp.route('user/<string:users_id>', methods=['GET'])
+def get_users(users_id):
+    return UsersService.get_users(users_id)
+
 @users_bp.route('user/<string:users_id>', methods=['PUT'])
 def update_users(users_id):
     data = request.json

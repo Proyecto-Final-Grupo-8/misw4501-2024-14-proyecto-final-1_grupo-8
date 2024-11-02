@@ -47,17 +47,17 @@ class Incident(db.Model):
     source = db.Column(db.String(20), nullable=True)
     customer_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     analyst_id = db.Column(db.String(36), db.ForeignKey('users.id'))
-    status = db.Column(db.String(20), nullable=False, default='Abierto')
+    status = db.Column(db.String(20), nullable=False, default='Open')
 
     # Relaciones
     logs = db.relationship('IncidentLog', backref='incident', lazy=True, cascade="all, delete")
 
     def asignar_analyst(self, analyst):
         self.analyst_id = analyst.id
-        self.status = 'En Proceso'
+        self.status = 'Progress'
 
     def cerrar_incident(self):
-        self.status = 'Cerrado'
+        self.status = 'Closed'
 
     def serialize(self):
         return {
@@ -85,7 +85,11 @@ class IncidentLog(db.Model):
             'id': self.id,
             'details': self.details,
             'created_date': self.created_date,
-            'user': self.users.username  # Cambiado 'users' a 'user'
+            'user_id': self.users.id,            
+            'user_name': self.users.username,
+            'user_mail': self.users.email,
+            'user_role': self.users.role
+            
         }
 
 # Modelo de Contract
