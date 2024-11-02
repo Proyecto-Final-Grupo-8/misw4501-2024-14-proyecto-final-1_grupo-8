@@ -57,7 +57,7 @@ def users_info():
 
 @users_bp.route('user/<string:users_id>', methods=['GET'])
 def get_users(users_id):
-    return UsersService.get_users(users_id)
+    return UsersService.get_users_info(users_id)
 
 @users_bp.route('user/<string:users_id>', methods=['PUT'])
 def update_users(users_id):
