@@ -116,14 +116,18 @@ class UsersServiceTestCase(unittest.TestCase):
             'name': 'Test',
             'last_name': 'User'
         }
-        response_register = self.client.post('/api/register', json=data)
-        response_register_data = response_register.get_json()
+
+        self.client.post('/api/register', json=data)
 
         login_data = {'username': 'testuser', 'password': 'Test@1234'}
         response_login = self.client.post('/api/login', json=login_data)
         response_login_data = response_login.get_json()
 
-        user_id = response_register_data.get('id')
+        user_token = response_login_data.get('access_token')
+
+        response_get_user = self.client.get('/api/user', headers={'Authorization': f'Bearer {user_token}'})
+        response_get_user_data=response_get_user.get_json()
+        user_id = response_get_user_data.get('id')
 
         # Actualizar usuario
         update_data = {'phone': '0987654321'}

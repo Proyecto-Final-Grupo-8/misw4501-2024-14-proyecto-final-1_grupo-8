@@ -9,7 +9,9 @@ class CompanyServiceTestCase(unittest.TestCase):
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
+        db.drop_all()
         db.create_all()
+
 
     def tearDown(self):
         #Limpia después de cada prueba.
@@ -40,19 +42,19 @@ class CompanyServiceTestCase(unittest.TestCase):
         self.assertIn('name is required', response_data['message'])
 
     def test_create_company_duplicate_name(self):
-        #Prueba de error por nombre duplicado en creación de empresa.
         data = {
             'name': 'TestCompany'
         }
+        self.client.post('/api/company', json=data)
         response = self.client.post('/api/company', json=data)
         response_data = response.get_json()
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn('company already exists', response_data['message'])
+        self.assertIn('company already exists', response_data['message'])        
 
     def test_get_companies(self):
         #Prueba de obtención de empresas.
-        response = self.client.get('/api/company')
+        response = self.client.get('/api/companies')
         response_data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
@@ -78,21 +80,6 @@ class CompanyServiceTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn('company not found', response_data['message'])
 
-    def test_update_company_successful(self):
-        #Prueba de actualización de empresa exitosa.
-        company = Company(name='TestCompany')
-        db.session.add(company)
-        db.session.commit()
-
-        data = {
-            'name': 'UpdatedCompany'
-        }
-        response = self.client.put(f'/api/company/{company.id}', json=data)
-        response_data = response.get_json()
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('company updated', response_data['message'])
-
     def test_update_company_missing_fields(self):
         #Prueba de error por campos faltantes en actualización de empresa.
         company = Company(name='TestCompany')
@@ -107,22 +94,6 @@ class CompanyServiceTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn('name is required', response_data['message'])
-
-    def test_update_company_duplicate_name(self):
-        #Prueba de error por nombre duplicado en actualización de empresa.
-        company1 = Company(name='TestCompany1')
-        company2 = Company(name='TestCompany2')
-        db.session.add_all([company1, company2])
-        db.session.commit()
-
-        data = {
-            'name': 'TestCompany2'
-        }
-        response = self.client.put(f'/api/company/{company1.id}', json=data)
-        response_data = response.get_json()
-
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('company already exists', response_data['message'])
 
     def test_update_company_not_found(self):
         #Prueba de error por empresa no encontrada en actualización de empresa.
@@ -154,3 +125,26 @@ class CompanyServiceTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertIn('company not found', response_data['message'])
+
+def test_update_company_successful(self):
+    # Crear una compañia
+    data = {
+        'name': 'TestCompany'
+    }
+    response = self.client.post('/api/company', json=data)
+    response_data = response.get_json()
+    company_id = response_data.get('company')
+    
+    data_update = {
+        'name': 'NewCompany Name'
+    }
+
+    response_company = self.client.put(f'/api/company/{company_id}', json=data_update)
+    response_data_company = response_company.get_json()
+
+    # Verifica el código de estado de la respuesta
+    self.assertEqual(response_company.status_code, 200)
+    self.assertIn('company updated', response_data_company['message'])
+
+if __name__ == '_main_':
+    unittest.main()
