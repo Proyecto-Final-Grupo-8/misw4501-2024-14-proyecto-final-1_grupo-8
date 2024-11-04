@@ -67,7 +67,7 @@ def update_incident(incident_id):
     if users.role != 'analyst' and users.role != 'admin':
         return jsonify({"message": "you are not allowed to update this incident"}), 403
     
-    if users.role == 'analyst' and data.get('status') not in ['pendiente', 'en progreso', 'resuelto']:
+    if users.role == 'analyst' and data.get('status') not in ['Open', 'Progress', 'Closed', 'Rejected', 'Escalated', 'Canceled']:
         return jsonify({"message": "invalid status"}), 400
     
     IncidentService.update_incident(users.role,incident_id, data)  
