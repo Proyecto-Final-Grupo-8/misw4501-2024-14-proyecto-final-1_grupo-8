@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.models.models import Contract
@@ -21,10 +22,13 @@ def create_contract():
     if not data.get('company_id'):
         return jsonify({"message": "company_id is required"}), 400
     
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d').date()
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d').date()
+ 
     nuevo_contract = Contract(
         description=data.get('description'), 
-        start_date=data.get('start_date'),
-        end_date=data.get('end_date'),
+        start_date=start_date,
+        end_date=end_date,
         company_id=data.get('company_id'),
         plan=data.get('plan')
     )
@@ -47,6 +51,14 @@ def get_contract_by_id(contract_id):
 @contract_bp.route('/contract/<string:contract_id>', methods=['PUT'])
 def update_contract(contract_id):
     data = request.json
+
+    if data.get('start_date'):
+        data['start_date'] = datetime.strptime(data.get('start_date'), '%Y-%m-%d').date()
+    
+    if data.get('end_date'):
+        data['end_date'] = datetime.strptime(data.get('end_date'), '%Y-%m-%d').date()
+
+
     contract_obj = ContractService.update_contract(contract_id, data)
     if not contract_obj:
         return jsonify({"message": "contract not found"}), 404

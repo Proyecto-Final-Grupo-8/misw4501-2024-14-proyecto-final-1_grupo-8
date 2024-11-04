@@ -146,5 +146,28 @@ def test_update_company_successful(self):
     self.assertEqual(response_company.status_code, 200)
     self.assertIn('company updated', response_data_company['message'])
 
+    # Verifica que la compañia fue actualizada
+    response = self.client.get(f'/api/company/{company_id}')
+    response_data = response.get_json()
+    self.assertEqual(response_data['name'], 'NewCompany Name')
+
+def test_delete_company_successful(self):
+    # Crear una compañia
+    data = {
+        'name': 'TestCompany'
+    }
+    response = self.client.post('/api/company', json=data)
+    response_data = response.get_json()
+    company_id = response_data.get('company')
+
+    response = self.client.delete(f'/api/company/{company_id}')
+
+def test_delete_company_not_found(self):
+    response = self.client.delete('/api/company/1')
+    response_data = response.get_json()
+
+    self.assertEqual(response.status_code, 404)
+    self.assertIn('company not found', response_data['message'])
+
 if __name__ == '_main_':
     unittest.main()
