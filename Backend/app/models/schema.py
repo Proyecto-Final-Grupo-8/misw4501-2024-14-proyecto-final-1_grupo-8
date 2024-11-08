@@ -1,5 +1,5 @@
 import strawberry
-from typing import List
+from typing import List, Optional
 from app.models import Users, Incident, IncidentLog, Contract, Company, Rates, Invoices, LogInvoices, CompanyServices
 from app.extensions import db
 
@@ -104,71 +104,139 @@ class CompanyServicesType:
 
 @strawberry.type
 class Query:
-    @strawberry.field
-    def users(self, id: str = None, username: str = None) -> List[UserType]:
-        query = db.session.query(Users)
-        if id:
-            query = query.filter(Users.id.like(f"%{id}%"))
-        if username:
-            query = query.filter(Users.username.like(f"%{username}%"))
+    @strawberry.field 
+    def users(self, id: Optional[str] = None, username: Optional[str] = None, email: Optional[str] = None, phone: Optional[str] = None, name: Optional[str] = None, last_name: Optional[str] = None, role: Optional[str] = None ) -> List[UserType]: 
+        query = db.session.query(Users) 
+        filters = { 
+            "id": id, 
+            "username": username, 
+            "email": email, 
+            "phone": phone, 
+            "name": name, 
+            "last_name": last_name, 
+            "role": role 
+            } 
+        for key, value in filters.items(): 
+            if value is not None: 
+                query = query.filter(getattr(Users, key).like(f"%{value}%")) 
         return query.all()
 
     @strawberry.field
-    def incidents(self,description: str = None) -> List[IncidentType]:
+    def incidents(self,description: Optional[str] = None, created_date: Optional[str] = None, modified_date: Optional[str] = None, source: Optional[str] = None, status: Optional[str] = None ) -> List[IncidentType]:
         query = db.session.query(Incident)
-        if description:
-            query = query.filter(Incident.description.like(f"%{description}%"))
+        filter = {
+            "description": description,
+            "created_date": created_date,
+            "modified_date": modified_date,
+            "source": source,
+            "status": status
+        }
+        for key, value in filter.items():
+            if value:
+                query = query.filter(getattr(Incident, key).like(f"%{value}%"))
         return query.all()
 
     @strawberry.field
-    def incident_logs(self, details: str = None) -> List[IncidentLogType]:
-        query = db.session.query(IncidentLog)
-        if details:
-            query = query.filter(IncidentLog.details.like(f"%{details}%"))
-        return query.all()
-
-    @strawberry.field
-    def contracts(self, id: str = None, description: str = None) -> List[ContractType]:
-        query = db.session.query(Contract)
-        if id:
-            query = query.filter(Contract.id.like(f"%{id}%"))
-        if description:
-            query = query.filter(Contract.description.like(f"%{description}%"))
-        return query.all()
-
-    @strawberry.field
-    def companies(self, name: str = None) -> List[CompanyType]:
-        query = db.session.query(Company)
-        if name:
-            query = query.filter(Company.name.like(f"%{name}%"))
-        return query.all()
-
-    @strawberry.field
-    def rates(self, source: str = None) -> List[RatesType]:
-        query = db.session.query(Rates)
-        if source:
-            query = query.filter(Rates.source.like(f"%{source}%"))
-        return query.all()
-
-    @strawberry.field
-    def invoices(self, amount: float = None) -> List[InvoicesType]:
-        query = db.session.query(Invoices)
-        if amount:
-            query = query.filter(Invoices.amount == amount)
-        return query.all()
-
-    @strawberry.field
-    def log_invoices(self, description: str = None) -> List[LogInvoicesType]:
+    def log_invoices(self, id: Optional[str] = None, amount: Optional[float] = None, id_invoice: Optional[str] = None, created_date: Optional[str] = None, quantity: Optional[int] = None, description: Optional[str] = None, source: Optional[str] = None) -> List[LogInvoicesType]:
         query = db.session.query(LogInvoices)
-        if description:
-            query = query.filter(LogInvoices.description.like(f"%{description}%"))
+        filters = {
+            "id": id,
+            "amount": amount,
+            "id_invoice": id_invoice,
+            "created_date": created_date,
+            "quantity": quantity,
+            "description": description,
+            "source": source
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(LogInvoices, key).like(f"%{value}%"))
         return query.all()
 
     @strawberry.field
-    def company_services(self, description: str = None) -> List[CompanyServicesType]:
+    def contracts(self, id: Optional[str] = None, description: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, plan: Optional[str] = None, company_id: Optional[str] = None) -> List[ContractType]:
+        query = db.session.query(Contract)
+        filters = {
+            "id": id,
+            "description": description,
+            "start_date": start_date,
+            "end_date": end_date,
+            "plan": plan,
+            "company_id": company_id
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(Contract, key).like(f"%{value}%"))
+        return query.all()
+
+    @strawberry.field
+    def companies(self, id: Optional[str] = None, name: Optional[str] = None, created_date: Optional[str] = None) -> List[CompanyType]:
+        query = db.session.query(Company)
+        filters = {
+            "id": id,
+            "name": name,
+            "created_date": created_date
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(Company, key).like(f"%{value}%"))
+        return query.all()
+
+    @strawberry.field
+    def rates(self, id: Optional[str] = None, rate: Optional[float] = None, rate_per_incident: Optional[float] = None, id_contract: Optional[str] = None, source: Optional[str] = None) -> List[RatesType]:
+        query = db.session.query(Rates)
+        filters = {
+            "id": id,
+            "rate": rate,
+            "rate_per_incident": rate_per_incident,
+            "id_contract": id_contract,
+            "source": source
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(Rates, key).like(f"%{value}%"))
+        return query.all()
+
+    @strawberry.field
+    def invoices(self, id: Optional[str] = None, amount: Optional[float] = None, id_contract: Optional[str] = None, company_id: Optional[str] = None, created_date: Optional[str] = None) -> List[InvoicesType]:
+        query = db.session.query(Invoices)
+        filters = {
+            "id": id,
+            "amount": amount,
+            "id_contract": id_contract,
+            "company_id": company_id,
+            "created_date": created_date
+        }
+
+    @strawberry.field
+    def log_invoices(self, id: Optional[str] = None, amount: Optional[float] = None, id_invoice: Optional[str] = None, created_date: Optional[str] = None, quantity: Optional[int] = None, description: Optional[str] = None, source: Optional[str] = None) -> List[LogInvoicesType]:
+        query = db.session.query(LogInvoices)
+        filters = {
+            "id": id,
+            "amount": amount,
+            "id_invoice": id_invoice,
+            "created_date": created_date,
+            "quantity": quantity,
+            "description": description,
+            "source": source
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(LogInvoices, key).like(f"%{value}%"))
+        return query.all()
+
+    @strawberry.field
+    def company_services(self, id: Optional[str] = None, description: Optional[str] = None, id_company: Optional[str] = None, created_date: Optional[str] = None) -> List[CompanyServicesType]:
         query = db.session.query(CompanyServices)
-        if description:
-            query = query.filter(CompanyServices.description.like(f"%{description}%"))
+        filters = {
+            "id": id,
+            "description": description,
+            "id_company": id_company,
+            "created_date": created_date
+        }
+        for key, value in filters.items():
+            if value:
+                query = query.filter(getattr(CompanyServices, key).like(f"%{value}%"))
         return query.all()
 
 # Definir el esquema de GraphQL
