@@ -2,3 +2,5 @@
 1 - 10-22-2024 14:45
 Despliegue de pruebas del back
 Despliegue de graphql
+
+asd
