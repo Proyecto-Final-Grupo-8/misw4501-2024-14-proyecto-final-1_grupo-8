@@ -21,7 +21,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"postgresql://{db_credentials['DB_USER']}:{db_credentials['DB_PASSWORD']}@" \
                               f"{db_credentials['DB_HOST']}:{db_credentials['DB_PORT']}/{db_credentials['DB_NAME']}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = db_credentials['JWT_SECRET_KEY'] #os.getenv('JWT_SECRET_KEY', 'supersecretkey123')
+    JWT_SECRET_KEY = db_credentials['JWT_SECRET_KEY']
+
 
 class TestingConfig(Config):
     TESTING = True
