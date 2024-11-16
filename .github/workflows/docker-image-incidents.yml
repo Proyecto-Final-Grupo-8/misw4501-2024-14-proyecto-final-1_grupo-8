@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run
+name: Deploy to Cloud Run - Incidents
 
 env:
   SERVICE_NAME: backend-incidentes

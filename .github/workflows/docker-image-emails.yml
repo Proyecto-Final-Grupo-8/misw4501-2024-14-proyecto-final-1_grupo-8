@@ -1,9 +1,9 @@
-name: Deploy to Cloud Run
+name: Deploy to Cloud Run - Emails
 
 env:
   SERVICE_NAME: backend-emails
   PROJECT_ID: proyecto-final-438201
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/bakend-email/backendemails
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/backend-email/backendemails
   
 
 on:
