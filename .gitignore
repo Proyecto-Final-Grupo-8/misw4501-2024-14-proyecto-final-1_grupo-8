@@ -2,3 +2,5 @@ venv
 __pycache__/
 htmlcov/
 .coverage
+Backend_mails/credentials_temp.json
+Backend_mails/token.json
