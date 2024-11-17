@@ -3,8 +3,8 @@ import imaplib
 import email
 import re
 import json
-from app.models.models import Users, Incident  # Importa el modelo de Incident
-from app.extensions import db  # Importa la instancia de db correctamente
+from app.models.models import Users, Incident, IncidentLog  # Importar IncidentLog
+from app.extensions import db  # Importar db correctamente
 
 def get_secret():
     try:
@@ -44,7 +44,7 @@ class MailService:
             email_ids = messages[0].split()
             print("Número de correos no leídos:", len(email_ids))
 
-            # Recorrer los IDs de los correos y obtener el asunto y el remitente
+            # Recorrer los IDs de los correos y obtener el asunto, remitente y cuerpo
             for email_id in email_ids:
                 status, msg_data = mail.fetch(email_id, '(RFC822)')
                 if status != 'OK':
@@ -57,9 +57,24 @@ class MailService:
                         subject = msg.get("Subject", "Sin asunto")
                         from_email = msg.get("From", "Remitente desconocido")
 
-                        # Extraer solo el correo electrónico
+                        # Extraer solo el correo electrónico del remitente
                         match = re.search(r'<([^>]+)>', from_email)
                         email_address = match.group(1) if match else from_email
+
+                        # Extraer el cuerpo del mensaje como texto plano
+                        body = ""
+                        if msg.is_multipart():
+                            for part in msg.walk():
+                                content_type = part.get_content_type()
+                                content_disposition = str(part.get("Content-Disposition"))
+
+                                # Obtener la parte de texto plano
+                                if content_type == "text/plain" and "attachment" not in content_disposition:
+                                    body = part.get_payload(decode=True).decode('utf-8', errors='ignore').strip()
+                                    break
+                        else:
+                            # Si no es multipart, intentamos obtener el contenido directamente
+                            body = msg.get_payload(decode=True).decode('utf-8', errors='ignore').strip()
 
                         # Validar si el correo pertenece a un usuario registrado
                         usuario = Users.query.filter_by(email=email_address).first()
@@ -74,7 +89,16 @@ class MailService:
                             )
                             db.session.add(nuevo_incidente)
                             db.session.commit()  # Guardar el incidente en la base de datos
-                            print(f"Incidente creado para el usuario {usuario.id}")
+
+                            # Crear un log asociado al incidente
+                            nuevo_log = IncidentLog(
+                                details=body,  # Usamos el cuerpo del correo como texto del log
+                                users_id=usuario.id,
+                                incident_id=nuevo_incidente.id
+                            )
+                            db.session.add(nuevo_log)
+                            db.session.commit()  # Guardar el log en la base de datos
+                            print(f"Incidente y log creados para el usuario {usuario.id}")
 
                             emails_data.append([email_id.decode(), subject, email_address, usuario.id])
                         else:

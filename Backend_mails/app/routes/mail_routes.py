@@ -6,7 +6,7 @@ from app.services.mail_service import MailService
 mail_bp = Blueprint('mail', __name__)
 
 # Define el endpoint utilizando el Blueprint
-@mail_bp.route('/procesar-correos', methods=['POST'])
+@mail_bp.route('/get-emails', methods=['POST'])
 #@jwt_required()  # Descomenta esto si necesitas autenticar la solicitud
 def procesar_correos_endpoint():
     try:
