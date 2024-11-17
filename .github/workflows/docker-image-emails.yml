@@ -1,9 +1,9 @@
-name: Deploy to Cloud Run - Incidents
+name: Deploy to Cloud Run - Emails
 
 env:
-  SERVICE_NAME: backend-incidentes
+  SERVICE_NAME: backend-emails
   PROJECT_ID: proyecto-final-438201
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/bakend-incidents/backendincidentes
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/backend-email/backendemails
   
 
 on:
@@ -14,7 +14,7 @@ on:
 jobs:
   dockerize-and-deploy:
     
-    if: contains(github.event.head_commit.message, 'Despliegue Incidentes MC') || contains(github.event.head_commit.message, 'Deploy  Incidents MC') || contains(github.event.head_commit.message, 'Release  Incidents MC')
+    if: contains(github.event.head_commit.message, 'Despliegue Emails MC') || contains(github.event.head_commit.message, 'Deploy Emails MC') || contains(github.event.head_commit.message, 'Release Emails MC')
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./Backend_incidentes
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./Backend_mails
         continue-on-error: false
 
       - name: Push Docker image to Artifact Registry
