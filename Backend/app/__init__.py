@@ -22,6 +22,7 @@ def create_app(config_name=None):
     from app.routes.contract_routes import contract_bp
     from app.routes.rate_routes import rate_bp
     from app.routes.status_routes import status_bp
+    from app.routes.chat_route import magicloops_bp
     from app.routes.graphql_routes import graphql_bp  # Importa el nuevo blueprint de GraphQL
 
     app.register_blueprint(users_bp, url_prefix='/api')
@@ -29,6 +30,7 @@ def create_app(config_name=None):
     app.register_blueprint(incident_bp, url_prefix='/api')
     app.register_blueprint(contract_bp, url_prefix='/api')
     app.register_blueprint(rate_bp, url_prefix='/api')
+    app.register_blueprint(magicloops_bp, url_prefix='/api')
     app.register_blueprint(status_bp)
     app.register_blueprint(graphql_bp, url_prefix='/api')  # Registra el blueprint de GraphQL
 
