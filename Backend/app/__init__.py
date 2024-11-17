@@ -35,3 +35,4 @@ def create_app(config_name=None):
     app.register_blueprint(graphql_bp, url_prefix='/api')  # Registra el blueprint de GraphQL
 
     return app
+
