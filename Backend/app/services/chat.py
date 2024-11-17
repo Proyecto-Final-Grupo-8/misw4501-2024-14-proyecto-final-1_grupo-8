@@ -10,7 +10,7 @@ class ChatService:
         message = data.get('details')
         if not message:
             return {"message": "Details is required"}, 400
-
+ 
         payload = {
             "details": message,
             "context": data.get('context', []) 
