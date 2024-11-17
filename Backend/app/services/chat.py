@@ -4,16 +4,16 @@ from flask import current_app
 class ChatService:
     @staticmethod
     def send_message_to_magicloops(data):
-        MAGICLOOPS_API_URL = "https://magicloops.dev/api/loop/dcc1548f-2aff-4bba-8573-a0511b550359/run"
+        MAGICLOOPS_API_URL = "https://magicloops.dev/api/loop/32f98c71-b8c1-4aa7-bd03-f7731f052c4c/run"
         MAGICLOOPS_API_KEY = ""
 
-        message = data.get('message')
+        message = data.get('details')
         if not message:
-            return {"message": "Message is required"}, 400
+            return {"message": "Details is required"}, 400
 
         payload = {
-            "message": message,
-            "context": data.get('context', {}) 
+            "details": message,
+            "context": data.get('context', []) 
         }
         headers = {
             "Authorization": f"Bearer {MAGICLOOPS_API_KEY}",
@@ -25,7 +25,7 @@ class ChatService:
             response_data = response.json()
 
             if response.status_code == 200:
-                return {"magicloops_response": response_data}, 200
+                return  response_data, 200
             else:
                 return {"message": "Error from MagicLoops", "details": response_data}, response.status_code
 
