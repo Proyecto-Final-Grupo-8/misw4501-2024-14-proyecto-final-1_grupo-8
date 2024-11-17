@@ -1,107 +1,89 @@
-from flask import app
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from google.cloud import secretmanager
-import os
+import imaplib
+import email
 import re
-import logging
-from app.models.models import Users, Incident, IncidentLog  # Importa tus modelos correctamente
+import json
+from app.models.models import Users, Incident  # Importa el modelo de Incident
 from app.extensions import db  # Importa la instancia de db correctamente
 
-
-def get_secret(secret_name, project_id):
-    client = secretmanager.SecretManagerServiceClient()
-    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
-    response = client.access_secret_version(request={"name": secret_path})
-    return response.payload.data.decode("UTF-8")
-
-# Configura Gmail API
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
-
+def get_secret():
+    try:
+        client = secretmanager.SecretManagerServiceClient()
+        secret_name = "projects/781163639586/secrets/Secret_Credentials/versions/latest"
+        response = client.access_secret_version(request={"name": secret_name})
+        secret_string = response.payload.data.decode("UTF-8")
+        return json.loads(secret_string)
+    except Exception as e:
+        print(f"Error al obtener el secreto: {e}")
+        return None
 
 class MailService:
     @staticmethod
-    def obtener_servicio_gmail():
-        # Configuración de Gmail API
-        creds = None
-        project_id = "781163639586"  # Reemplaza con tu ID de proyecto
-        secret_name = "mail-credentias"  # Reemplaza con el nombre de tu secreto
-
-        # Recupera las credenciales desde Secret Manager
-        credentials_json = get_secret(secret_name, project_id)
-
-        # Guarda temporalmente el archivo de credenciales en disco
-        with open("credentials_temp.json", "w") as file:
-            file.write(credentials_json)
-
-        # Maneja las credenciales de Gmail API
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials_temp.json", SCOPES
-                )
-                creds = flow.run_local_server(port=0)
-
-            # Guarda el token de acceso
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
-
-        return build("gmail", "v1", credentials=creds)
-
-    @staticmethod
     def obtener_asuntos_remitentes_y_ids():
+        mail_credentials = get_secret()
+        if not mail_credentials:
+            print("No se pudieron obtener las credenciales.")
+            return []
 
-        service = build('gmail', 'v1', credentials=creds)
-        results = service.users().messages().list(userId='me', labelIds=['INBOX'], q='is:unread').execute()
-        messages = results.get('messages', [])
+        imap_server = 'imap.gmail.com'
+        username = mail_credentials.get('MAIL_SERVICE')
+        password = mail_credentials.get('MAIL_PASSWORD')
+        emails_data = []
 
-        if not messages:
-            print("No hay mensajes no leídos.")
-        else:
-            for message in messages:
-                msg = service.users().messages().get(userId='me', id=message['id']).execute()
-                payload = msg['payload']
-                headers = payload['headers']
+        try:
+            mail = imaplib.IMAP4_SSL(imap_server)
+            mail.login(username, password)
+            mail.select('inbox')
 
-                # Extraer el remitente y el asunto del correo
-                remitente = next(header['value'] for header in headers if header['name'] == 'From')
-                cuerpo_correo = payload['body']['data'] if 'data' in payload['body'] else "Sin contenido"
+            # Buscar solo los mensajes no leídos
+            status, messages = mail.search(None, 'UNSEEN')
+            if status != 'OK':
+                print("Error al buscar en la bandeja de entrada.")
+                return []
 
-                # Decodificar el cuerpo del correo si es necesario
-                if cuerpo_correo:
-                    cuerpo_correo = base64.urlsafe_b64decode(cuerpo_correo).decode('utf-8', errors='ignore')
+            email_ids = messages[0].split()
+            print("Número de correos no leídos:", len(email_ids))
 
-                # Procesar el correo
-                procesar_correo(remitente, cuerpo_correo)
+            # Recorrer los IDs de los correos y obtener el asunto y el remitente
+            for email_id in email_ids:
+                status, msg_data = mail.fetch(email_id, '(RFC822)')
+                if status != 'OK':
+                    print(f"Error al obtener el mensaje con ID {email_id.decode()}")
+                    continue
 
-    # Procesar correo
-    @staticmethod
-    def procesar_correo(correo_remitente, cuerpo_correo):
-        email_pattern = r'<([^>]+)>'
-        match = re.search(email_pattern, correo_remitente)
-        fixed_email = match.group(1) if match else correo_remitente  # Maneja el caso en que no haya coincidencia
+                for response_part in msg_data:
+                    if isinstance(response_part, tuple):
+                        msg = email.message_from_bytes(response_part[1])
+                        subject = msg.get("Subject", "Sin asunto")
+                        from_email = msg.get("From", "Remitente desconocido")
 
-        # Verificar si el remitente está registrado en la tabla Users
-        usuario = Users.query.filter_by(email=fixed_email).first()
+                        # Extraer solo el correo electrónico
+                        match = re.search(r'<([^>]+)>', from_email)
+                        email_address = match.group(1) if match else from_email
 
-        if usuario:
-            # Crear un nuevo incidente si el usuario existe
-            nuevo_incidente = Incident(
-                description=cuerpo_correo,
-                source="email",
-                customer_id=usuario.id
-            )
-            db.session.add(nuevo_incidente)
-            db.session.commit()
-            print("Incidente creado con éxito.")
-            return "Incidente creado con éxito."
-        else:
-            print(f"{correo_remitente} El remitente no está registrado en la base de datos.")
-            return "El remitente no está registrado en la base de datos."
+                        # Validar si el correo pertenece a un usuario registrado
+                        usuario = Users.query.filter_by(email=email_address).first()
+                        if usuario:
+                            print(f"Correo encontrado: {email_address}, ID de usuario: {usuario.id}")
+
+                            # Crear un nuevo incidente
+                            nuevo_incidente = Incident(
+                                description=subject,  # Usamos el asunto como descripción
+                                source="email",
+                                customer_id=usuario.id
+                            )
+                            db.session.add(nuevo_incidente)
+                            db.session.commit()  # Guardar el incidente en la base de datos
+                            print(f"Incidente creado para el usuario {usuario.id}")
+
+                            emails_data.append([email_id.decode(), subject, email_address, usuario.id])
+                        else:
+                            print(f"Correo no encontrado en la base de datos: {email_address}")
+
+        except Exception as e:
+            print(f"Error al acceder a la bandeja de entrada: {e}")
+        finally:
+            if 'mail' in locals():
+                mail.logout()  # Cerrar la conexión
+
+        return emails_data
