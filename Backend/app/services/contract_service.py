@@ -18,7 +18,7 @@ class ContractService:
     
     @staticmethod
     def update_contract(contract_id, contract_data):
-        contract = Contract.query.get(contract_id)
+        contract = db.session.get(Contract,contract_id)
         if not contract:
             return None
         contract.description = contract_data.get('description', contract.description)
@@ -31,7 +31,7 @@ class ContractService:
 
     @staticmethod
     def delete_contract(contract_id):
-        contract = Contract.query.get(contract_id)
+        contract = db.session.get(Contract,contract_id)
         if not contract:
             return None
         db.session.delete(contract)

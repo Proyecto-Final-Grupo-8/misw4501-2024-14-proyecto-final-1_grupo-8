@@ -30,7 +30,7 @@ def create_incident():
 @jwt_required()
 def get_all_incident():
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
 
     if not users:
         return jsonify({"message": "users not found"}), 404
@@ -43,7 +43,7 @@ def get_all_incident():
 @jwt_required()
 def get_incident_by_id(incident_id):
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
 
     if not users:
         return jsonify({"message": "users not found"}), 404
@@ -58,7 +58,7 @@ def get_incident_by_id(incident_id):
 def update_incident(incident_id):
     user_id = get_jwt_identity()
     data = request.json
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     incident_obj = Incident.query.filter_by(id=incident_id).first()
     
     if not incident_obj:
@@ -77,7 +77,7 @@ def update_incident(incident_id):
 @jwt_required()
 def delete_incident(incident_id):
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     incident_obj = Incident.query.filter_by(id=incident_id).first()
 
     if not incident_obj:
@@ -95,7 +95,7 @@ def delete_incident(incident_id):
 def create_incident_log(incident_id):
     user_id = get_jwt_identity()
     data = request.get_json()
-    users= Users.query.get(user_id)
+    users= db.session.get(Users, user_id)
     Incident_obj = Incident.query.filter_by(id=incident_id, customer_id=user_id).first()
 
     if not data.get('details'):
@@ -122,7 +122,7 @@ def create_incident_log(incident_id):
 @jwt_required()
 def get_logs_for_incident(incident_id):
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     Incident_obj = Incident.query.filter_by(id=incident_id).first()
 
     if not users:
@@ -138,7 +138,7 @@ def get_logs_for_incident(incident_id):
 @jwt_required()
 def get_log_by_id(incident_id, log_id):
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     Incident_obj = Incident.query.filter_by(id=incident_id).first()
     log_obj = IncidentLog.query.filter_by(id=log_id).first()
 
@@ -158,7 +158,7 @@ def get_log_by_id(incident_id, log_id):
 def update_log(incident_id, log_id):
     user_id = get_jwt_identity()
     data = request.json
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     Incident_obj = Incident.query.filter_by(id=incident_id).first()
     log_obj = IncidentLog.query.filter_by(id=log_id).first()
 
@@ -178,7 +178,7 @@ def update_log(incident_id, log_id):
 @jwt_required()
 def delete_log(incident_id, log_id):
     user_id = get_jwt_identity()
-    users = Users.query.get(user_id)
+    users = db.session.get(Users, user_id)
     Incident_obj = Incident.query.filter_by(id=incident_id).first()
     log_obj = IncidentLog.query.filter_by(id=log_id).first()
 

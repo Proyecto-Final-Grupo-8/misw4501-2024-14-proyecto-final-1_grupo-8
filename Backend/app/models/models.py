@@ -185,7 +185,7 @@ class LogInvoices(db.Model):
             'quantity': self.quantity,
             'description': self.description,
             'source': self.source
-        }
+        } 
     
 class CompanyServices(db.Model):
     __tablename__ = 'company_services'

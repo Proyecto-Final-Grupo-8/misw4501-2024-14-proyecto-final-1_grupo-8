@@ -27,7 +27,7 @@ class IncidentService:
     @staticmethod
     def update_incident(user_rol,incident_id, data):
         if user_rol == 'analyst':
-            incident = Incident.query.get(incident_id)        
+            incident = db.session.get(Incident, incident_id)        
             if not incident:
                 return None        
             incident.status = data.get('status', incident.status)
@@ -36,7 +36,7 @@ class IncidentService:
             return incident
         
         if user_rol == 'admin':
-            incident = Incident.query.get(incident_id)
+            incident = db.session.get(Incident, incident_id)       
             if not incident:
                 return None
             incident.description = data.get('description', incident.description)
@@ -49,7 +49,7 @@ class IncidentService:
         
     @staticmethod
     def delete_incident(incident_id):
-        incident = Incident.query.get(incident_id)
+        incident = db.session.get(Incident, incident_id)
         if not incident:
             return None
         db.session.delete(incident)
@@ -69,11 +69,11 @@ class IncidentService:
     
     @staticmethod
     def get_log_by_id(log_id):
-        return IncidentLog.query.get(log_id)
+        return db.session.get(IncidentLog, log_id)
     
     @staticmethod
     def update_log(log_id, data):
-        log = IncidentLog.query.get(log_id)
+        log = db.session.get(IncidentLog, log_id)
         if not log:
             return None
         log.details = data.get('details', log.details)
@@ -82,7 +82,7 @@ class IncidentService:
     
     @staticmethod
     def delete_log(log_id):
-        log = IncidentLog.query.get(log_id)
+        log = db.session.get(IncidentLog, log_id)
         if not log:
             return None
         db.session.delete(log)

@@ -65,7 +65,7 @@ class UsersService:
 
     @staticmethod
     def get_users_info(users_id):
-        users = Users.query.get(users_id)
+        users = db.session.get(Users, users_id)
 
         if not users:
             return {'message': 'users not found'}, 404
@@ -85,7 +85,7 @@ class UsersService:
 
     @staticmethod
     def delete_users(users_id):
-        users = Users.query.get(users_id)
+        users = db.session.get(Users, users_id)
 
         if not users:
             return {'message': 'users not found'}, 404
@@ -98,7 +98,7 @@ class UsersService:
 
     @staticmethod
     def update_users(users_id, data):
-        users = Users.query.get(users_id)
+        users = db.session.get(Users, users_id)
         
         if not users:
             return {'message': 'users not found'}, 404

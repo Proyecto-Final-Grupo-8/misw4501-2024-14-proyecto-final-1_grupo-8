@@ -18,7 +18,7 @@ class CompanyService:
     
     @staticmethod
     def update_company(company_id, company_data):
-        company = Company.query.get(company_id)
+        company = db.session.get(Company, company_id)
         if not company:
             return None
         company.name = company_data.get('name', company.name)        
@@ -27,7 +27,7 @@ class CompanyService:
     
     @staticmethod
     def delete_company(company_id):
-        company = Company.query.get(company_id)
+        company = db.session.get(Company, company_id)
         if not company:
             return None
         db.session.delete(company)

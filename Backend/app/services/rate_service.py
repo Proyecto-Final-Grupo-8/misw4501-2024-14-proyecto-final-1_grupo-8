@@ -18,7 +18,7 @@ class RateService:
     
     @staticmethod
     def update_rate(rate_id, rate_data):
-        rate = Rates.query.get(rate_id)
+        rate = db.session.get(Rates ,rate_id)
         if not rate:
             return None
         rate.rate = rate_data.get('rate', rate.rate)
@@ -29,7 +29,7 @@ class RateService:
 
     @staticmethod
     def delete_rate(rate_id):
-        rate = Rates.query.get(rate_id)
+        rate = db.session.get(Rates ,rate_id)
         if not rate:
             return None
         db.session.delete(rate)

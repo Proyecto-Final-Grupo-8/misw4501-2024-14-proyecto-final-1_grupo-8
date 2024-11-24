@@ -31,7 +31,7 @@ def get_companies():
 
 @company_bp.route('/company/<string:company_id>', methods=['GET'])
 def get_company_by_id(company_id):
-    company = Company.query.get(company_id)
+    company = db.session.get(Company,company_id)
 
     if not company:
         return {'message': 'company not found'}, 404
@@ -45,7 +45,7 @@ def get_company_by_id(company_id):
 @company_bp.route('/company/<string:company_id>', methods=['PUT'])
 def update_company(company_id):
     data = request.json
-    company = Company.query.get(company_id)
+    company = db.session.get(Company,company_id)
     if not company:
         return {'message': 'company not found'}, 404
     
@@ -57,7 +57,7 @@ def update_company(company_id):
 
 @company_bp.route('/company/<string:company_id>', methods=['DELETE'])
 def delete_company(company_id):
-    company = Company.query.get(company_id)
+    company = db.session.get(Company, company_id)
     if not company:
         return {'message': 'company not found'}, 404
     
