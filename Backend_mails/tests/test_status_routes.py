@@ -23,4 +23,4 @@ class StatusServiceTestCases(unittest.TestCase):
         response_data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Backend running', response_data['message'])
+        self.assertIn('Backend Emails running', response_data['message'])

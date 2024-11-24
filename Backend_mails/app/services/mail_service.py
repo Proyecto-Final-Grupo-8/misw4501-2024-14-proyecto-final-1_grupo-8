@@ -57,18 +57,16 @@ class MailService:
                         subject = msg.get("Subject", "Sin asunto")
                         from_email = msg.get("From", "Remitente desconocido")
 
-                        # Extraer solo el correo electrónico del remitente
                         match = re.search(r'<([^>]+)>', from_email)
                         email_address = match.group(1) if match else from_email
 
-                        # Extraer el cuerpo del mensaje como texto plano
                         body = ""
                         if msg.is_multipart():
                             for part in msg.walk():
                                 content_type = part.get_content_type()
                                 content_disposition = str(part.get("Content-Disposition"))
 
-                                # Obtener la parte de texto plano
+
                                 if content_type == "text/plain" and "attachment" not in content_disposition:
                                     body = part.get_payload(decode=True).decode('utf-8', errors='ignore').strip()
                                     break
@@ -83,21 +81,21 @@ class MailService:
 
                             # Crear un nuevo incidente
                             nuevo_incidente = Incident(
-                                description=subject,  # Usamos el asunto como descripción
+                                description=subject,
                                 source="email",
                                 customer_id=usuario.id
                             )
                             db.session.add(nuevo_incidente)
-                            db.session.commit()  # Guardar el incidente en la base de datos
+                            db.session.commit() 
 
                             # Crear un log asociado al incidente
                             nuevo_log = IncidentLog(
-                                details=body,  # Usamos el cuerpo del correo como texto del log
+                                details=body,  
                                 users_id=usuario.id,
                                 incident_id=nuevo_incidente.id
                             )
                             db.session.add(nuevo_log)
-                            db.session.commit()  # Guardar el log en la base de datos
+                            db.session.commit()  
                             print(f"Incidente y log creados para el usuario {usuario.id}")
 
                             emails_data.append([email_id.decode(), subject, email_address, usuario.id])
