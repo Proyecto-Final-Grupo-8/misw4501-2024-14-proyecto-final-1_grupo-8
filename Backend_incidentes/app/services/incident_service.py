@@ -11,11 +11,19 @@ class IncidentService:
         return nuevo_incident
 
     @staticmethod
-    def get_all_incident(user_id,user_role):
-        if user_role == 'customer':
-            return Incident.query.filter_by(customer_id=user_id).all()
-        elif user_role == 'analyst' or user_role == 'admin':
-            return Incident.query.all()
+    def get_all_incident(user_id, user_role):
+        try:
+
+            if user_role == 'customer':
+                return Incident.query.filter_by(customer_id=user_id).all()
+            elif user_role in ['analyst', 'admin']:
+                return Incident.query.all()
+
+            return []
+        except Exception as e:
+
+            print(f"Error retrieving incidents: {str(e)}")
+            return []
 
     @staticmethod
     def get_incident_by_id(user_id,user_role,incident_id):
