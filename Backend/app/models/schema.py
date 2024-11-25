@@ -8,7 +8,7 @@ from app.extensions import db
 def apply_filters(query, model, filters: dict):
     for key, value in filters.items():
         if value is not None:
-            query = query.filter(getattr(model, key).like(f"%{value}%"))
+            query = query.filter(getattr(model, key) == value)
     return query
 
 # Definición de tipos de GraphQL
