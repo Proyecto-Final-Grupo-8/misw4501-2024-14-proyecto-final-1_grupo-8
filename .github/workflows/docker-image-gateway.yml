@@ -1,0 +1,58 @@
+name: Deploy to Cloud Run - gateway
+
+env:
+  SERVICE_NAME: gateway
+  PROJECT_ID: proyecto-final-438201
+  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/proyecto-final-438201/gateway/gateway
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  dockerize-and-deploy:
+    
+    if: contains(github.event.head_commit.message, 'Despliegue gateway') || contains(github.event.head_commit.message, 'Deploy gateway') || contains(github.event.head_commit.message, 'Release gateway')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Google Cloud Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ env.PROJECT_ID }}
+        continue-on-error: false
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+        continue-on-error: false
+
+      - name: Configure Docker for GCP (Artifact Registry)
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+        continue-on-error: false
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./gateway
+        continue-on-error: false
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push ${{ env.DOCKER_IMAGE_URL }}:latest
+        continue-on-error: false
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.DOCKER_IMAGE_URL }}:latest \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated
+        continue-on-error: false            
