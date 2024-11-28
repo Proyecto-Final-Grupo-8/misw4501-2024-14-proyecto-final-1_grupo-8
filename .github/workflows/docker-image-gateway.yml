@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./gateway
+          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest ./Gateway
         continue-on-error: false
 
       - name: Push Docker image to Artifact Registry
