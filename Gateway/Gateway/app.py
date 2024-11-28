@@ -41,7 +41,7 @@ def proxy(path):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/status', methods=['GET'])
+@app.route('/', methods=['GET'])
 def health_check():
     """
     Endpoint de salud para verificar que el API Gateway está funcionando.
