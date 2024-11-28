@@ -3,11 +3,11 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./Gateway
+      context: .
     ports:
       - "5000:5000"
     networks:
-      - gateway
+      - backend
 
 networks:
   backend:
